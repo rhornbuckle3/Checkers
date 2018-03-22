@@ -9,51 +9,39 @@ class checkersFrank:
         self.wOne=np.array(np.zeros((32,16)))
         self.wTwo=np.array(np.zeros((16,1)))
         self.kingDex=np.array(np.zeros((12)))
-        self.stateSequence=[]
-        self.stateSequenceScore=[]
-    def initWeights(self):
+        self.stateSequence=pd.DataFrame(cG.defaultState)
+        self.stateSequence.append(np.array([0]))
+        self.side=None
+    def initWeights(self,weightONE,weightTWO):
         self.wOne=pd.load_pickle("frankWONE")
         self.wTwo=pd.load_pickle("frankWTWO")
+    def setSide(self,side):
+        self.side=side
         #gotta figure out a rudimentary saving function for this
-    def 
-    def retPositA(self):
-        return self.positA
-    def retPositE(self):
-        return self.positE
-    def retCurrentStateA(self):
-        return self.genInputState(self.retPositA,self.retPositE)
-    def retCurrentStateE(self):
-        return self.genInputState(self.retPositE,self.retPositA)
-    def updateStateSequence(self,stateInput,stateInputScore):
-        #takes 8,4 array as input
-        #to be called after a new state(n+1) has been decided by this actor
-        self.stateSequence.append(stateInput.tolist())
-        self.stateSequenceScore.append(stateInputScore)
     def getStateSequence(self):
         return self.stateSequence
-    def getStateSequenceScore(self):
-        return self.stateSequenceScore
-    def genInputState(self,stateA,stateE):
-        inputReadyState=np.array(np.zeros((1,48)))
-        flipFlop=True
-        k=0
-        for l in range(0,1):
-            for i in range(0,12):
-                for j in range(0,1):
-                    if(flipFlop):
-                        inputReadyState[0,k]=stateA[j,i]
-                        k=k+1
-                    else:
-                        inputReadyState[0,k]=stateE[j,i]
-                        k=k+1
-            flipFlop=False    
-        return inputReadyState
+    def addToSeq(self,newState,newScore):
+        newState=np.append(np.array(newScore))
+        self.stateSequence=pd.concat([self.stateSequence,pd.DataFrame(newState)],axis=1)
     def stateDecider(self,currentState):
         providedSet=self.stateProvider(currentState)
         stateValue=self.stateEvaluatorMaster(providedSet)
+        best=np.argmax(stateValue)
+        self.addToSeq(providedSet[best],stateValue[best])
+        return providedSet[best]
     def stateProvider(self,currentState):
-        providedSet=np.array(np.zeros((32,1)))
+        currentState.reshape((8,4))
+        workingSet=[]
+        if(side='black'):
+            for i in range(0,8):
+                for j in range(0,4):
+                    if(currentState[i,j]==1):
+
+
+        else:  
+
         #implement this big giant if statement
+        
         return providedSet
     def activationOne(self,neuronNum,inputZero):
         inputZero.reshape((1,-1))
@@ -65,8 +53,7 @@ class checkersFrank:
         stateValue=np.array(np.zeros(providedSet.shape[1]))
         for i in range(0,providedSet.shape[1]):
             stateValue[i]=self.mainEvaluator(providedSet[:,i])
-        return 
-
+        return stateValue
     def mainEvaluator(self,potState):
         prodOne=np.array(np.zeros((1,24)))
         for i in range(0,prodOne.shape[1]):
