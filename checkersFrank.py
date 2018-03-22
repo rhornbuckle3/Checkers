@@ -11,6 +11,7 @@ class checkersFrank:
         self.kingDex=np.array(np.zeros((12)))
         self.stateSequence=pd.DataFrame(cG.defaultState)
         self.stateSequence.append(np.array([0]))
+        #Redo this with a pandas dataframe
         self.side=None
         self.sideCOE=0
     def initWeights(self,weightONE,weightTWO):
@@ -26,14 +27,15 @@ class checkersFrank:
     def getStateSequence(self):
         return self.stateSequence
     def addToSeq(self,newState,newScore):
-        newState=np.append(np.array(newScore))
+        newState=np.append(newState,np.array(newScore))
         self.stateSequence=pd.concat([self.stateSequence,pd.DataFrame(newState)],axis=1)
+        #^up to the consideration of the logging method, likely to be changed
     def stateDecider(self,currentState):
         providedSet=self.stateProvider(currentState)
         stateValue=self.stateEvaluatorMaster(providedSet)
         best=np.argmax(stateValue)
-        self.addToSeq(providedSet[best],stateValue[best])
-        return providedSet[best]
+        self.addToSeq(providedSet[range(32*best,32*best+32)],stateValue[best])
+        return providedSet[range(32*best,32*best+32)]
     def rowRule(self,iNum,jNum):
         q=iNum%2
         if(q==1):
@@ -233,7 +235,6 @@ class checkersFrank:
                     prioritySet.append(self.priorityStateFarmer(i,j,currentState,prioritySet))
                     if(prioritySet[range(len(prioritySet)-32],len(prioritySet))]):
                         prioritySet.remove(range(len(prioritySet)-32],len(prioritySet)))
-        #implement this big giant if statement
         if(not(currentState.reshape((1,-1)).tolist()==prioritySet[0,31])
             return prioritySet
         else:
@@ -245,11 +246,12 @@ class checkersFrank:
         inputOne.reshape((1,-1))
         return mt.log((1+mt.e**np.matmul(wTwo[:,0],inputOne)))
     def stateEvaluatorMaster(self,providedSet):
-        stateValue=np.array(np.zeros(providedSet.shape[1]))
-        for i in range(0,providedSet.shape[1]):
-            stateValue[i]=self.mainEvaluator(providedSet[:,i])
+        stateValue=np.array(np.zeros(len(providedSet)/32))
+        for i in range(0,stateValue.shape[1]):
+            stateValue[i]=self.mainEvaluator(providedSet[range(i*32,i*32+32)])
         return stateValue
     def mainEvaluator(self,potState):
+        #USING TENSORFLOW, ALL OF THE FOLLOWING CODE IS POOP
         prodOne=np.array(np.zeros((1,24)))
         for i in range(0,prodOne.shape[1]):
             prodOne[0,i]=self.activationOne(i,potState)
