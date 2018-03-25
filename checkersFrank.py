@@ -50,7 +50,7 @@ class checkersFrank:
             else:
                 return True #i, i+len(small)
         return False
-    def constainsTwo(self, small, big):
+    def containsTwo(self, small, big):
         for i in range(0,len(big)-len(small)+1):
             for j in range(0,len(small)):
                 if(big[i+j] != small[j]):
@@ -58,7 +58,7 @@ class checkersFrank:
             else:
                 return i, i+len(small)
         return False
-    def stateFarmer(self,iNum,jNum,currentState):
+    def stateFarmer(self, iNum,jNum,currentState):
         #Empty Move Checker
         farmSet=[]
         cur=currentState[iNum,jNum]
@@ -68,34 +68,34 @@ class checkersFrank:
                 newState=np.copy(currentState)
                 newState[iNum,jNum]=0
                 newState[iNum+1*self.sideCOE,jOne]=cur
-                newState=newState.reshape((1,-1))
-                farmSet.append(newState)
+                newState=newState.reshape((1,-1)).tolist()
+                farmSet.extend(newState)
             if(jTwo in range(0,4)):
                 if(currentState[iNum+1*self.sideCOE,jTwo]==0):
                     newState=np.copy(currentState)
                     newState[iNum,jNum]=0
                     newState[iNum+1*self.sideCOE,jTwo]=cur
-                    newState=newState.reshape((1,-1))
-                    farmSet.append(newState)
+                    newState=newState.reshape((1,-1)).tolist()
+                    farmSet.extend(newState)
         if(cur==2):
             if(iNum-1*self.sideCOE in range(0,8)):    
                 if(currentState[iNum-1*self.sideCOE,jOne]==0):
                     newState=np.copy(currentState)
                     newState[iNum,jNum]=0
                     newState[iNum-1*self.sideCOE,jOne]=cur
-                    newState=newState.reshape((1,-1))
-                    farmSet.append(newState)
+                    newState=newState.reshape((1,-1)).tolist()
+                    farmSet.extend(newState)
                 if(jTwo in range(0,4)):
                     if(currentState[iNum-1*self.sideCOE,jTwo]==0):
                         newState=np.copy(currentState)
                         newState[iNum,jNum]=0
                         newState[iNum-1*self.sideCOE,jTwo]=cur
-                        newState=newState.reshape((1,-1))
-                        farmSet.append(newState)
+                        newState=newState.reshape((1,-1)).tolist()
+                        farmSet.extend(newState)    
         return farmSet
     def priorityStateFarmer(self,iNum,jNum,currentState,prioritySet):
         #Priority Move Checker
-        if(((iNum==7)and(self.sideCOE==1))or((iNum=0)and(self.sideCOE==-1))):
+        if(((iNum==7)and(sideCOE==1))or((iNum==0)and(sideCOE==-1))):
             currentState[iNum,jNum]=2
         jOne,jTwo=self.rowRule(iNum,jNum)
         cur=currentState[iNum,jNum]
@@ -113,10 +113,10 @@ class checkersFrank:
                                 newState[iNum+2*self.sideCOE,jOne+1]=cur
                                 newStateSet=[newState.reshape((1,-1))]
                                 if(self.contains(currentState.reshape((1,-1)).tolist(),prioritySet)):
-                                    start,end=self.constainsTwo(currentState.reshape((1,-1)).tolist(),prioritySet)
+                                    start,end=self.containsTwo(currentState.reshape((1,-1)).tolist(),prioritySet)
                                     prioritySet.remove(range(start,end))
                                     #removeCurrentStateFromPrioritySet
-                                prioritySet.append(self.priorityStateFarmer(iNum+2*self.sideCOE,jOne+1,newState,newStateSet))
+                                prioritySet.extend(priorityStateFarmer(iNum+2*self.sideCOE,jOne+1,newState,newStateSet))
                                 #newStateFuncwithRecursion
                     else:
                         if(currentState[iNum+2*self.sideCOE,jOne-1]==0):
@@ -126,10 +126,10 @@ class checkersFrank:
                             newState[iNum+2*self.sideCOE,jOne-1]=cur
                             newStateSet=[newState.reshape((1,-1))]
                             if(self.contains(currentState.reshape((1,-1)).tolist(),prioritySet)):
-                                start,end=self.constainsTwo(currentState.reshape((1,-1)).tolist(),prioritySet)
+                                start,end=self.containsTwo(currentState.reshape((1,-1)).tolist(),prioritySet)
                                 prioritySet.remove(range(start,end))
                                 #removeCurrentStateFromPrioritySet
-                            prioritySet.append(self.priorityStateFarmer(iNum+2*self.sideCOE,jOne-1,newState,newStateSet))
+                            prioritySet.extend(priorityStateFarmer(iNum+2*self.sideCOE,jOne-1,newState,newStateSet))
                             #newStateFuncwithRecursion
                 if(jTwo in range(0,4)):
                     #jTwoCases
@@ -142,10 +142,10 @@ class checkersFrank:
                                 newState[iNum+2*self.sideCOE,jTwo-1]=cur
                                 newStateSet=[newState.reshape((1,-1))]
                                 if(self.contains(currentState.reshape((1,-1)).tolist(),prioritySet)):
-                                    start,end=self.constainsTwo(currentState.reshape((1,-1)).tolist(),prioritySet)
+                                    start,end=self.containsTwo(currentState.reshape((1,-1)).tolist(),prioritySet)
                                     prioritySet.remove(range(start,end))
                                     #removeCurrentStateFromPrioritySet
-                                prioritySet.append(self.priorityStateFarmer(iNum+2*self.sideCOE,jTwo-1,newState,newStateSet))
+                                prioritySet.extend(priorityStateFarmer(iNum+2*self.sideCOE,jTwo-1,newState,newStateSet))
                                 #newStateFuncwithRecursion
                         else:
                             if(jTwo+1 in range(0,4)):
@@ -156,10 +156,10 @@ class checkersFrank:
                                     newState[iNum+2*self.sideCOE,jTwo+1]=cur
                                     newStateSet=[newState.reshape((1,-1))]
                                     if(self.contains(currentState.reshape((1,-1)).tolist(),prioritySet)):
-                                        start,end=self.constainsTwo(currentState.reshape((1,-1)).tolist(),prioritySet)
+                                        start,end=self.containsTwo(currentState.reshape((1,-1)).tolist(),prioritySet)
                                         prioritySet.remove(range(start,end))
                                         #removeCurrentStateFromPrioritySet
-                                    prioritySet.append(self.priorityStateFarmer(iNum+2*self.sideCOE,jTwo+1,newState,newStateSet))
+                                    prioritySet.append(priorityStateFarmer(iNum+2*self.sideCOE,jTwo+1,newState,newStateSet))
                                     #newStateFuncwithRecursion
             if(cur==2):
                 if(iNum-2*self.sideCOE in range(0,8)):
@@ -174,10 +174,10 @@ class checkersFrank:
                                     newState[iNum-2*self.sideCOE,jOne+1]=cur
                                     newStateSet=[newState.reshape((1,-1))]
                                     if(self.contains(currentState.reshape((1,-1)).tolist(),prioritySet)):
-                                        start,end=self.constainsTwo(currentState.reshape((1,-1)).tolist(),prioritySet)
+                                        start,end=self.containsTwo(currentState.reshape((1,-1)).tolist(),prioritySet)
                                         prioritySet.remove(range(start,end))
                                         #removeCurrentStateFromPrioritySet
-                                    prioritySet.append(self.priorityStateFarmer(iNum-2*self.sideCOE,jOne+1,newState,newStateSet))
+                                    prioritySet.extend(priorityStateFarmer(iNum-2*self.sideCOE,jOne+1,newState,newStateSet))
                                     #newStateFuncwithRecursion
                         else:
                             if(currentState[iNum-2*self.sideCOE,jOne-1]==0):
@@ -187,10 +187,10 @@ class checkersFrank:
                                 newState[iNum-2*self.sideCOE,jOne-1]=cur
                                 newStateSet=[newState.reshape((1,-1))]
                                 if(self.contains(currentState.reshape((1,-1)).tolist(),prioritySet)):
-                                    start,end=self.constainsTwo(currentState.reshape((1,-1)).tolist(),prioritySet)
+                                    start,end=self.containsTwo(currentState.reshape((1,-1)).tolist(),prioritySet)
                                     prioritySet.remove(range(start,end))
                                     #removeCurrentStateFromPrioritySet
-                                prioritySet.append(self.priorityStateFarmer(iNum-2*self.sideCOE,jOne-1,newState,newStateSet))
+                                prioritySet.extend(priorityStateFarmer(iNum-2*self.sideCOE,jOne-1,newState,newStateSet))
                                 #newStateFuncwithRecursion
                     if(jTwo in range(0,4)):
                         #jTwoCases
@@ -204,10 +204,10 @@ class checkersFrank:
                                     newState[iNum-2*self.sideCOE,jTwo-1]=cur
                                     newStateSet=[newState.reshape((1,-1))]
                                     if(self.contains(currentState.reshape((1,-1)).tolist(),prioritySet)):
-                                        start,end=self.constainsTwo(currentState.reshape((1,-1)).tolist(),prioritySet)
+                                        start,end=self.containsTwo(currentState.reshape((1,-1)).tolist(),prioritySet)
                                         prioritySet.remove(range(start,end))
                                         #removeCurrentStateFromPrioritySet
-                                    prioritySet.append(self.priorityStateFarmer(iNum-2*self.sideCOE,jTwo-1,newState,newStateSet))
+                                    prioritySet.extend(priorityStateFarmer(iNum-2*self.sideCOE,jTwo-1,newState,newStateSet))
                             else:
                                 if(jTwo+1 in range(0,4)):
                                     if(currentState[iNum-2*self.sideCOE,jTwo+1]==0):
@@ -217,28 +217,37 @@ class checkersFrank:
                                         newState[iNum-2*self.sideCOE,jTwo+1]=cur
                                         newStateSet=[newState.reshape((1,-1))]
                                         if(self.contains(currentState.reshape((1,-1)).tolist(),prioritySet)):
-                                            start,end=self.constainsTwo(currentState.reshape((1,-1)).tolist(),prioritySet)
+                                            start,end=self.containsTwo(currentState.reshape((1,-1)).tolist(),prioritySet)
                                             prioritySet.remove(range(start,end))
                                             #removeCurrentStateFromPrioritySet
-                                        prioritySet.append(self.priorityStateFarmer(iNum-2*self.sideCOE,jTwo+1,newState,newStateSet))
+                                        prioritySet.extend(priorityStateFarmer(iNum-2*self.sideCOE,jTwo+1,newState,newStateSet))
                                         #newStateFuncwithRecursion
             return prioritySet
-    def stateProvider(self,currentState):
+    def stateProvider(self, currentState):
         currentState.reshape((8,4))
         workingSet=[]
         prioritySet=[]
+        prioritySet.extend(currentState.reshape((1,-1)).tolist())
         for i in range(0,8):
             for j in range(0,4):
-                if(currentState[i,j]<0):
-                    workingSet.append(self.stateFarmer(i,j,currentState))
-                    prioritySet.append(currentState.reshape((1,-1)).tolist())
-                    prioritySet.append(self.priorityStateFarmer(i,j,currentState,prioritySet))
-                    if(prioritySet[range(len(prioritySet)-32],len(prioritySet))]):
-                        prioritySet.remove(range(len(prioritySet)-32],len(prioritySet)))
-        if(not(currentState.reshape((1,-1)).tolist()==prioritySet[0,31])
+                if(currentState[i,j]>0):
+                    stateF=self.stateFarmer(i,j,currentState)
+                    if(not(stateF)):
+                        pass
+                    else:
+                        workingSet.extend(stateF)
+                    prioritySet.extend(self.priorityStateFarmer(i,j,currentState,prioritySet))
+                    if(prioritySet[(len(prioritySet)-33):(len(prioritySet)-1)]==currentState.reshape((1,-1)).tolist()):
+                        del prioritySet[(len(prioritySet)-33):(len(prioritySet)-1)]
+        if(prioritySet[(len(prioritySet)-33):(len(prioritySet)-1)]==currentState.reshape((1,-1)).tolist()):
+            prioritySet.remove(prioritySet[(len(prioritySet)-33):(len(prioritySet)-1)])
+        if(not(currentState.reshape((1,-1)).tolist()==prioritySet[0:31])):
+            print('priority set')
+            print(len(workingSet))
             return prioritySet
         else:
-            return farmSet
+            print('farm set')
+            return workingSet
     def activationOne(self,neuronNum,inputZero):
         inputZero.reshape((1,-1))
         return 1/(1+mt.e**-(np.matmul(wOne[:,neuronNum],inputZero)))
