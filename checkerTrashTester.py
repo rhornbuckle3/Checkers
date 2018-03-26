@@ -5,7 +5,7 @@ import checkersGame as cG
 import pickle as pk
 sideCOE=1
 #import checkersFrank as cF
-testState=np.array((1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1))
+testState=np.array((1,1,1,1,1,1,1,1,1,1,1,1,0,-1,0,0,0,0,0,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1))
 testState=testState.reshape((8,4))
 #print(cG.defaultState)
 out=pd.DataFrame(cG.defaultState)
@@ -89,10 +89,10 @@ def priorityStateFarmer(iNum,jNum,currentState,prioritySet):
                             newState[iNum,jNum]=0
                             newState[iNum+1*sideCOE,jOne]=0
                             newState[iNum+2*sideCOE,jOne+1]=cur
-                            newStateSet=[newState.reshape((1,-1))]
+                            newStateSet=[newState.reshape((1,-1)).tolist()]
                             if(contains(currentState.reshape((1,-1)).tolist(),prioritySet)):
                                 start,end=constainsTwo(currentState.reshape((1,-1)).tolist(),prioritySet)
-                                prioritySet.remove(range(start,end))
+                                del prioritySet[start:end]
                                 #removeCurrentStateFromPrioritySet
                             prioritySet.extend(priorityStateFarmer(iNum+2*sideCOE,jOne+1,newState,newStateSet))
                             #newStateFuncwithRecursion
@@ -102,10 +102,10 @@ def priorityStateFarmer(iNum,jNum,currentState,prioritySet):
                         newState[iNum,jNum]=0
                         newState[iNum+1*sideCOE,jOne]=0
                         newState[iNum+2*sideCOE,jOne-1]=cur
-                        newStateSet=[newState.reshape((1,-1))]
+                        newStateSet=[newState.reshape((1,-1)).tolist()]
                         if(contains(currentState.reshape((1,-1)).tolist(),prioritySet)):
                             start,end=constainsTwo(currentState.reshape((1,-1)).tolist(),prioritySet)
-                            prioritySet.remove(range(start,end))
+                            del prioritySet[start:end]
                             #removeCurrentStateFromPrioritySet
                         prioritySet.extend(priorityStateFarmer(iNum+2*sideCOE,jOne-1,newState,newStateSet))
                         #newStateFuncwithRecursion
@@ -117,27 +117,27 @@ def priorityStateFarmer(iNum,jNum,currentState,prioritySet):
                             newState=np.copy(currentState)
                             newState[iNum,jNum]=0
                             newState[iNum+1*sideCOE,jTwo]=0
-                            newState[iNum+2*sideCOE,jTwo-1]=cur
-                            newStateSet=[newState.reshape((1,-1))]
+                            newState[iNum+2*sideCOE,jTwo]=cur
+                            newStateSet=[newState.reshape((1,-1)).tolist()]
                             if(contains(currentState.reshape((1,-1)).tolist(),prioritySet)):
                                 start,end=constainsTwo(currentState.reshape((1,-1)).tolist(),prioritySet)
-                                prioritySet.remove(range(start,end))
+                                del prioritySet[start:end]
                                 #removeCurrentStateFromPrioritySet
-                            prioritySet.extend(priorityStateFarmer(iNum+2*sideCOE,jTwo-1,newState,newStateSet))
+                            prioritySet.extend(priorityStateFarmer(iNum+2*sideCOE,jTwo,newState,newStateSet))
                             #newStateFuncwithRecursion
                     else:
                         if(jTwo+1 in range(0,4)):
-                            if(currentState[iNum+2*sideCOE,jTwo+1]==0):
+                            if(currentState[iNum+2*sideCOE,jTwo]==0):
                                 newState=np.copy(currentState)
                                 newState[iNum,jNum]=0
                                 newState[iNum+1*sideCOE,jTwo]=0
-                                newState[iNum+2*sideCOE,jTwo+1]=cur
-                                newStateSet=[newState.reshape((1,-1))]
+                                newState[iNum+2*sideCOE,jTwo]=cur
+                                newStateSet=[newState.reshape((1,-1)).tolist()]
                                 if(contains(currentState.reshape((1,-1)).tolist(),prioritySet)):
                                     start,end=constainsTwo(currentState.reshape((1,-1)).tolist(),prioritySet)
-                                    prioritySet.remove(range(start,end))
+                                    del prioritySet[start:end]
                                     #removeCurrentStateFromPrioritySet
-                                prioritySet.append(priorityStateFarmer(iNum+2*sideCOE,jTwo+1,newState,newStateSet))
+                                prioritySet.append(priorityStateFarmer(iNum+2*sideCOE,jTwo,newState,newStateSet))
                                 #newStateFuncwithRecursion
         if(cur==2):
             if(iNum-2*sideCOE in range(0,8)):
@@ -150,10 +150,10 @@ def priorityStateFarmer(iNum,jNum,currentState,prioritySet):
                                 newState[iNum,jNum]=0
                                 newState[iNum-1*sideCOE,jOne]=0
                                 newState[iNum-2*sideCOE,jOne+1]=cur
-                                newStateSet=[newState.reshape((1,-1))]
+                                newStateSet=[newState.reshape((1,-1)).tolist()]
                                 if(contains(currentState.reshape((1,-1)).tolist(),prioritySet)):
                                     start,end=constainsTwo(currentState.reshape((1,-1)).tolist(),prioritySet)
-                                    prioritySet.remove(range(start,end))
+                                    del prioritySet[start:end]
                                     #removeCurrentStateFromPrioritySet
                                 prioritySet.extend(priorityStateFarmer(iNum-2*sideCOE,jOne+1,newState,newStateSet))
                                 #newStateFuncwithRecursion
@@ -163,10 +163,10 @@ def priorityStateFarmer(iNum,jNum,currentState,prioritySet):
                             newState[iNum,jNum]=0
                             newState[iNum-1*sideCOE,jOne]=0
                             newState[iNum-2*sideCOE,jOne-1]=cur
-                            newStateSet=[newState.reshape((1,-1))]
+                            newStateSet=[newState.reshape((1,-1)).tolist()]
                             if(contains(currentState.reshape((1,-1)).tolist(),prioritySet)):
                                 start,end=constainsTwo(currentState.reshape((1,-1)).tolist(),prioritySet)
-                                prioritySet.remove(range(start,end))
+                                del prioritySet[start:end]
                                 #removeCurrentStateFromPrioritySet
                             prioritySet.extend(priorityStateFarmer(iNum-2*sideCOE,jOne-1,newState,newStateSet))
                             #newStateFuncwithRecursion
@@ -180,10 +180,10 @@ def priorityStateFarmer(iNum,jNum,currentState,prioritySet):
                                 newState[iNum,jNum]=0
                                 newState[iNum-1*sideCOE,jTwo]=0
                                 newState[iNum-2*sideCOE,jTwo-1]=cur
-                                newStateSet=[newState.reshape((1,-1))]
+                                newStateSet=[newState.reshape((1,-1)).tolist()]
                                 if(contains(currentState.reshape((1,-1)).tolist(),prioritySet)):
                                     start,end=constainsTwo(currentState.reshape((1,-1)).tolist(),prioritySet)
-                                    prioritySet.remove(range(start,end))
+                                    del prioritySet[start:end]
                                     #removeCurrentStateFromPrioritySet
                                 prioritySet.extend(priorityStateFarmer(iNum-2*sideCOE,jTwo-1,newState,newStateSet))
                         else:
@@ -193,10 +193,10 @@ def priorityStateFarmer(iNum,jNum,currentState,prioritySet):
                                     newState[iNum,jNum]=0
                                     newState[iNum-1*sideCOE,jTwo]=0
                                     newState[iNum-2*sideCOE,jTwo+1]=cur
-                                    newStateSet=[newState.reshape((1,-1))]
+                                    newStateSet=[newState.reshape((1,-1)).tolist()]
                                     if(contains(currentState.reshape((1,-1)).tolist(),prioritySet)):
                                         start,end=constainsTwo(currentState.reshape((1,-1)).tolist(),prioritySet)
-                                        prioritySet.remove(range(start,end))
+                                        del prioritySet[start:end]
                                         #removeCurrentStateFromPrioritySet
                                     prioritySet.extend(priorityStateFarmer(iNum-2*sideCOE,jTwo+1,newState,newStateSet))
                                     #newStateFuncwithRecursion
@@ -214,9 +214,13 @@ def stateProvider(currentState):
                     pass
                 else:
                     workingSet.extend(stateF)
-                prioritySet.extend(priorityStateFarmer(i,j,currentState,prioritySet))
-                if(prioritySet[(len(prioritySet)-33):(len(prioritySet)-1)]==currentState.reshape((1,-1)).tolist()):
-                    del prioritySet[(len(prioritySet)-33):(len(prioritySet)-1)]
+                currentList=currentState.reshape((1,-1)).tolist()
+                prioritySet.extend(priorityStateFarmer(i,j,currentState,currentList))
+                #print(len(prioritySet))
+                #if(prioritySet[(len(prioritySet)-33):(len(prioritySet)-1)]==currentState.reshape((1,-1)).tolist()):
+                if(contains(currentState.reshape((1,-1)).tolist(),prioritySet)):
+                    start,end=constainsTwo(currentState.reshape((1,-1)).tolist(),prioritySet)
+                    del prioritySet[start:end]
     if(prioritySet[(len(prioritySet)-33):(len(prioritySet)-1)]==currentState.reshape((1,-1)).tolist()):
         prioritySet.remove(prioritySet[(len(prioritySet)-33):(len(prioritySet)-1)])
     if(not(currentState.reshape((1,-1)).tolist()==prioritySet[0:31])):
