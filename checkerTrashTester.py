@@ -2,7 +2,7 @@
 #2018
 #checkers
 import pandas as pd
-import numpy as np  
+import numpy as np   
 import math as mt  
 import checkersGame as cg 
 import pickle as pk
@@ -25,14 +25,14 @@ frank.setSide(0)
 #frank.printMoves(testState)
 #frank.stateEvaluatorMaster(testState)
 #bio=open("/home/russell/Documents/Frank/bio-Two.npz",mode="xb+")
-wOne=np.array(np.random.standard_normal((32,16)))
-wTwo=np.array(np.random.standard_normal((16,1)))
-game=np.array(np.zeros((1,1)))
-bio=np.load("Frank/bio-One.npz")
-wOne=bio['arr_0']
-wTwo=bio['arr_1']
-game=bio['arr_2']
-#np.savez("/home/russell/Documents/Frank/bio-Two.npz",wOne,wTwo,game)
+#wOne=np.array(np.random.standard_normal((32,16)))
+#wTwo=np.array(np.random.standard_normal((16,1)))
+#game=np.array(np.zeros((1,1)))
+#bio=np.load("Frank/bio-One.npz")
+#wOne=bio['arr_0']
+#wTwo=bio['arr_1']
+#game=bio['arr_2']
+##np.savez("/home/russell/Documents/Frank/bio-Two.npz",wOne,wTwo,game)
 
 
 
