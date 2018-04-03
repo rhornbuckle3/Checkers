@@ -9,9 +9,10 @@ class checkersFrank:
         self.wOne=np.array(np.zeros((32,16)))
         self.wTwo=np.array(np.zeros((16,1)))
         self.kingDex=np.array(np.zeros((12)))
-        self.stateSequence=pd.DataFrame(cG.defaultState)
-        #self.stateSequence=pd.DataFrame()
-        #Redo this with a pandas dataframe
+        #self.stateSequence=pd.DataFrame(cG.defaultState)
+        self.stateSequence=np.array(cG.defaultState)
+        self.stateSequence=stateSequence.reshape((-1,1))
+        self.stateSequence=np.append(self.stateSequence,0,axis=0)
         self.side=None
         self.sideCOE=0
         self.gameNum=None
@@ -57,7 +58,14 @@ class checkersFrank:
         for i in range(0,prodOne.shape[1]):
             prodOne[0,i]=self.activationOne(i,potState)
         return self.activationTwo(prodOne)
-
+    def stateDecider(self,currentState):
+        providedSet=self.stateProvider(currentState)
+        stateValue=self.stateEvaluatorMaster(providedSet)
+        best=np.argmax(stateValue)
+        #self.addToSeq(providedSet[range(32*best,32*best+32)],stateValue[best])
+        self.addToSeq(providedSet[best],stateValue[best])
+        return providedSet[best]
+    
 
 
 
@@ -66,20 +74,17 @@ class checkersFrank:
     def getStateSequence(self):
         return self.stateSequence
     def addToSeq(self,newState,newScore):
+        newState=np.array(newState)
         newState=np.append(newState,np.array(newScore))
-        self.stateSequence=pd.concat([self.stateSequence,pd.DataFrame(newState)],axis=1)
+        newState=newState.reshape((-1,1))
+        self.stateSequence=np.append(self.stateSequence,newState,axis=1)
+        #self.stateSequence=pd.concat([self.stateSequence,pd.DataFrame(newState)],axis=1)
         #^up to the consideration of the logging method, likely to be changed
     
 
 
 
 
-    def stateDecider(self,currentState):
-        providedSet=self.stateProvider(currentState)
-        stateValue=self.stateEvaluatorMaster(providedSet)
-        best=np.argmax(stateValue)
-        self.addToSeq(providedSet[range(32*best,32*best+32)],stateValue[best])
-        return providedSet[range(32*best,32*best+32)]
     
     
     
@@ -100,6 +105,7 @@ class checkersFrank:
         else:
             return jNum,jNum-1
     def stateProvider(self,currentState):
+        currentState=currentState*self.sideCOE
         curList=currentState.tolist()
         currentState=currentState.reshape((8,4))
         workingSet=[]
@@ -117,6 +123,8 @@ class checkersFrank:
                     prioritySet.extend(self.priorityStateFarmer(i,j,currentState,laughingSet))
                     if(curList  in prioritySet):
                         del prioritySet[prioritySet.index(curList)]
+        prioritySet=prioritySet*sideCOE
+        workingSet=workingSet*sideCOE
         if(len(prioritySet)>0):
             return prioritySet
         else:
