@@ -31,13 +31,6 @@ class checkersFrank:
         if(side==1):
             self.sideCOE=1
 
-
-
-
-
-
-
-    #Rewrite everything below this
     def stateEvaluatorMaster(self,providedSet):
         stateValue=np.array(np.zeros(len(providedSet)))
         for i in range(0,stateValue.shape[0]):
@@ -46,7 +39,6 @@ class checkersFrank:
 
     def mainEvaluator(self,potState,sOne,sTwo):
         potState=np.array(potState)
-        #USING TENSORFLOW, ALL OF THE FOLLOWING CODE IS POOP
         prodOne=np.array(np.zeros((1,16)))
         for i in range(0,prodOne.shape[1]):
             prodOne[0,i]=self.activationOne(i,potState,sOne)

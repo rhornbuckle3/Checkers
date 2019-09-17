@@ -39,7 +39,7 @@ def initPlayer():
     coinFlip=np.random.binomial(0,.5)
     frankOne=cf()
     frankOne.setSide(coinFlip)
-    frankOne.initWeights("/home/russell/Documents/Frank/bio-One.npz")
+    frankOne.initWeights("./Frank/bio-One.npz")
     if(coinFlip==1):
         coinFlip=0
     else:
@@ -47,7 +47,7 @@ def initPlayer():
     global frankTwo
     frankTwo=cf()
     frankTwo.setSide(coinFlip)
-    frankTwo.initWeights("/home/russell/Documents/Frank/bio-One.npz")
+    frankTwo.initWeights("./Frank/bio-Two.npz")
     if(coinFlip==0):
         activePlayer=frankTwo
     else:
