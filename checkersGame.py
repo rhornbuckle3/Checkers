@@ -39,6 +39,7 @@ def initPlayer():
     coinFlip=np.random.binomial(0,.5)
     frankOne=cf()
     frankOne.setSide(coinFlip)
+    print('FrankOne is side: '+str(coinFlip)+'; 0 is black, 1 is white')
     frankOne.initWeights("./Frank/bio-One.npz")
     if(coinFlip==1):
         coinFlip=0
@@ -64,6 +65,8 @@ def playBall():
     global frankTwo
     global activePlayer
     turn=1
+    #print(frankOne.wOne)
+    #print(frankOne.wTwo)
     while(True):
         #print(turn)
         #print(currentState)
@@ -85,7 +88,7 @@ def playBall():
             activePlayer=frankTwo
         else:
             activePlayer=frankOne
-        if(turn>1200):
+        if(turn>100):
             count=np.sum(newState)
             if(count>0):
                 print("White Wins")
@@ -131,8 +134,8 @@ def endGame():
     global frankOne
     global frankTwo
     global activePlayer
-    print(activePlayer.sideCOE)
-    print(currentState)
+    #print(activePlayer.sideCOE)
+    #print(currentState)
     #print(stateScores)
     if(np.sum(currentState)>0):
         winner=1
@@ -147,10 +150,9 @@ def endGame():
     #    print(frankOne.wOne[:,i])
     #print("new")
     aOne,aTwo=frankOne.gradDesc(stateSequence,stateScores,winner)
-    #for i in range(0,16):
-    #    print(aOne[:,i])
-    #bOne,bTwo=frankTwo.gradDesc(stateSequence,stateScores,winner)
     frankOne.saveWeights(aOne,aTwo)
+    #print(aOne)
+    #print(aTwo)
     bOne,bTwo=frankTwo.gradDesc(stateSequence,stateScores,winner)
     frankTwo.saveWeights(bOne,bTwo)
     #print(stateSequence)
