@@ -60,6 +60,15 @@ class checkersFrank:
         stateValue=self.stateEvaluatorMaster(providedSet)
         if(self.sideCOE==-1):
             stateValue=stateValue*self.sideCOE
+        
+        if(str(stateValue)=='[]'):
+            print(providedSet)
+            print(self.printState(currentState))
+            print('Player '+str(self.sideCOE)+' Loses')
+            if(self.sideCOE==-1):
+                return currentState, self.mainEvaluator(currentState,self.wOne,self.wTwo)
+            
+
         best=np.argmax(stateValue)
         #self.addToSeq(providedSet[range(32*best,32*best+32)],stateValue[best])
         #self.addToSeq(providedSet[best],stateValue[best])
@@ -70,30 +79,49 @@ class checkersFrank:
     def gradDesc(self,stateSequence,score,winner):
         bOne=np.copy(self.wOne)
         bTwo=np.copy(self.wTwo)
-        for i in range(1,stateSequence.shape[1]):
+        print(stateSequence)
+        print('State shape: '+str(stateSequence.shape[1]))
+        for i in range(0,stateSequence.shape[1]):
             predict=score[0,i]
             inputZero=np.copy(stateSequence[:,i])
             #inputZero=np.transpose(inputZero)
-            print(i)
+            print("Learning state "+str(i)+" on player: "+str(self.sideCOE))
             prodOne=np.array(np.zeros((1,16)))
             for j in range(0,prodOne.shape[1]):
                 prodOne[0,j]=self.activationOne(j,inputZero,bOne)
+            learning_step=1e-2
+            learning_check=1e-3
+            #print("upper weights")
+            iterator=0
             while(True):
+                iterator+=1
+                #print("running upper "+str(iterator))
                 checkTwo=np.copy(bTwo)
                 move=self.smallTwo(inputZero,predict,winner,prodOne,bOne,bTwo)
                 move=move*np.transpose(prodOne)
-                print(bTwo)
-                bTwo=np.subtract(bTwo,1e-1*move)
-                
-                if((np.argmax(abs(checkTwo-bTwo)))<1e-2):
+                #print(bTwo)
+                bTwo=np.subtract(bTwo,learning_step*move)
+                weight_Diff=abs(checkTwo-bTwo)
+                #if(weight_Diff[np.argmax(weight_Diff)]<learning_check):
+                #    break
+                if(iterator>3000):
                     break
+            print("lower weights")
+            iterator=0
+            learning_check_two=1e-5
             while(True):
-                print("lower")
+                iterator+=1
+                #print("running lower "+str(iterator))
                 checkOne=np.copy(bOne)
                 move=self.smallOne(inputZero,predict,winner,prodOne,bOne,bTwo)
                 #move - 32x16
-                bOne=np.subtract(bOne,1e-1*move)
-                if((np.argmax(abs(checkOne-bOne)))<1e-2):
+                #print(bOne)
+                bOne=np.subtract(bOne,learning_step*move)
+                weight_Diff=abs(checkOne-bOne)
+                weight_Diff=weight_Diff.flatten()
+                #if(weight_Diff[np.argmax(weight_Diff)]<learning_check_two):
+                #    break
+                if(iterator>3000):
                     break
         return bOne, bTwo
 
@@ -144,6 +172,13 @@ class checkersFrank:
             print(":")
             for j in range(7,-1,-1):
                 print(movey[j,:])
+    def printState(self,currentState):
+        movey=currentState
+        movey=movey.reshape((8,4))            
+        print(":")
+        for j in range(7,-1,-1):
+            print(movey[j,:])
+        
     def rowRule(self,iNum,jNum):
         q=iNum%2
         if(q==1):

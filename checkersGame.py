@@ -67,27 +67,39 @@ def playBall():
     while(True):
         #print(turn)
         #print(currentState)
+        check=False
         newState,newScore=activePlayer.stateDecider(currentState)
         addToSeq(newState,newScore)
         check=endGameCheck(newState)
+        if(np.array_equal(currentState,newState)):
+            if(activePlayer==frankOne):
+                activePlayer=frankTwo
+            else:
+                activePlayer=frankOne
+            endGame()
+            break
         if(check):
+            endGame()
             break
         if(activePlayer==frankOne):
             activePlayer=frankTwo
         else:
             activePlayer=frankOne
-        if(turn>=1200):
+        if(turn>1200):
             count=np.sum(newState)
             if(count>0):
                 print("White Wins")
+                endGame()
                 break
             if(count<0):
                 print("Black Wins")
+                endGame()
                 break
+        
         currentState=newState
         turn=turn+1
     #print(stateSequence.shape)
-    endGame()
+  
 
 #winner values:
 #white=1
@@ -134,9 +146,12 @@ def endGame():
     #for i in range(0,16):
     #    print(frankOne.wOne[:,i])
     #print("new")
-    aOne,aTwo=frankOne.gradDesc(stateSequence[:,1:3],stateScores,winner)
+    aOne,aTwo=frankOne.gradDesc(stateSequence,stateScores,winner)
     #for i in range(0,16):
     #    print(aOne[:,i])
     #bOne,bTwo=frankTwo.gradDesc(stateSequence,stateScores,winner)
     frankOne.saveWeights(aOne,aTwo)
+    bOne,bTwo=frankTwo.gradDesc(stateSequence,stateScores,winner)
+    frankTwo.saveWeights(bOne,bTwo)
+    print(stateSequence)
     #frankTwo.saveWeights(bOne,bTwo)
