@@ -62,13 +62,11 @@ class checkersFrank:
             stateValue=stateValue*self.sideCOE
         
         if(str(stateValue)=='[]'):
-            print(providedSet)
+            #print(providedSet)
             print(self.printState(currentState))
             print('Player '+str(self.sideCOE)+' Loses')
             if(self.sideCOE==-1):
                 return currentState, self.mainEvaluator(currentState,self.wOne,self.wTwo)
-            
-
         best=np.argmax(stateValue)
         #self.addToSeq(providedSet[range(32*best,32*best+32)],stateValue[best])
         #self.addToSeq(providedSet[best],stateValue[best])
@@ -79,7 +77,7 @@ class checkersFrank:
     def gradDesc(self,stateSequence,score,winner):
         bOne=np.copy(self.wOne)
         bTwo=np.copy(self.wTwo)
-        print(stateSequence)
+        #print(stateSequence)
         print('State shape: '+str(stateSequence.shape[1]))
         for i in range(0,stateSequence.shape[1]):
             predict=score[0,i]
@@ -90,7 +88,7 @@ class checkersFrank:
             for j in range(0,prodOne.shape[1]):
                 prodOne[0,j]=self.activationOne(j,inputZero,bOne)
             learning_step=1e-2
-            learning_check=1e-3
+            #learning_check=1e-3
             #print("upper weights")
             iterator=0
             while(True):
@@ -108,7 +106,7 @@ class checkersFrank:
                     break
             print("lower weights")
             iterator=0
-            learning_check_two=1e-5
+            #learning_check_two=1e-5
             while(True):
                 iterator+=1
                 #print("running lower "+str(iterator))
@@ -175,7 +173,7 @@ class checkersFrank:
     def printState(self,currentState):
         movey=currentState
         movey=movey.reshape((8,4))            
-        print(":")
+        print("Final State:")
         for j in range(7,-1,-1):
             print(movey[j,:])
         

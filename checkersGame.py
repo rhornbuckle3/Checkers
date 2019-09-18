@@ -153,5 +153,5 @@ def endGame():
     frankOne.saveWeights(aOne,aTwo)
     bOne,bTwo=frankTwo.gradDesc(stateSequence,stateScores,winner)
     frankTwo.saveWeights(bOne,bTwo)
-    print(stateSequence)
+    #print(stateSequence)
     #frankTwo.saveWeights(bOne,bTwo)
