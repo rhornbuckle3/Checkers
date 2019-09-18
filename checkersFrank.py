@@ -73,9 +73,9 @@ class checkersFrank:
         #self.addToSeq(providedSet[best],stateValue[best])
         #print('state values: '+str(stateValue))
         newState=np.array(providedSet[best])
-        print('Player: '+str(self.sideCOE))
-        self.printState(newState)
-        print('Score: '+str(stateValue[best]))
+        #print('Player: '+str(self.sideCOE))
+        #self.printState(newState)
+        #print('Score: '+str(stateValue[best]))
         return newState,stateValue[best]
 
     def gradDesc(self,stateSequence,score,winner):
@@ -88,6 +88,8 @@ class checkersFrank:
         for i in range(1,stateSequence.shape[1]):
             predict=score[0,i]
             inputZero=np.copy(stateSequence[:,i])
+            inputZero=inputZero*self.sideCOE
+            winner=winner*self.sideCOE
             #inputZero=np.transpose(inputZero)
             #print("Learning state "+str(i)+" on player: "+str(self.sideCOE))
             prodOne=np.array(np.zeros((1,16)))

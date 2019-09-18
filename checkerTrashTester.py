@@ -18,7 +18,6 @@ from checkersFrank import checkersFrank as cf
 #game=np.array(np.zeros((1,1)))
 #np.savez("./Frank/bio-One.npz",wOne,wTwo,game)
 
-
 cg.initPlayer()
 cg.playBall()
 

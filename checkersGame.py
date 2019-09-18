@@ -12,7 +12,6 @@ stateSequence=stateSequence.reshape((-1,1))
 stateScores=np.array(np.zeros((1,1)))
 #stateSequence=np.append(stateSequence,np.array([0]),axis=0)
 currentState=np.copy(defaultState)
-
 #sequence methods
 def addToSeq(newState,newScore):
         global stateSequence
@@ -36,7 +35,7 @@ def initPlayer():
     global frankOne
     #global currentState
     #global defaultState
-    coinFlip=np.random.binomial(0,.5)
+    coinFlip=np.random.binomial(1,.5)
     frankOne=cf()
     frankOne.setSide(coinFlip)
     print('FrankOne is side: '+str(coinFlip)+'; 0 is black, 1 is white')
@@ -54,8 +53,6 @@ def initPlayer():
     else:
         activePlayer=frankOne
     #currentState=defaultState
-
-
 
 #Game manager
 def playBall():
@@ -79,9 +76,21 @@ def playBall():
                 activePlayer=frankTwo
             else:
                 activePlayer=frankOne
+            count=np.sum(newState)
+            if(count>0):
+                print("White Wins")
+            if(count<0):
+                print("Black Wins")
+            frankOne.printState(newState)
             endGame()
             break
         if(check):
+            count=np.sum(newState)
+            if(count>0):
+                print("White Wins")
+            if(count<0):
+                print("Black Wins")
+            frankOne.printState(newState)
             endGame()
             break
         if(activePlayer==frankOne):
@@ -92,17 +101,14 @@ def playBall():
             count=np.sum(newState)
             if(count>0):
                 print("White Wins")
-                endGame()
-                break
             if(count<0):
                 print("Black Wins")
-                endGame()
-                break
-        
+            frankOne.printState(newState)
+            endGame()
+            break
         currentState=newState
         turn=turn+1
     #print(stateSequence.shape)
-  
 
 #winner values:
 #white=1
@@ -127,6 +133,7 @@ def endGameCheck(currentState):
     #combine here, or just have each frank hold onto a complete state sequence, or handle state sequence in this one and record each turn
     #combining here would be the cool thing to do
     #recording here would be the elegant thing to do
+
 def endGame():
     global stateSequence
     global stateScores
@@ -140,10 +147,10 @@ def endGame():
     if(np.sum(currentState)>0):
         winner=1
     if(np.sum(currentState)<0):
-        winner=0
+        winner=-1
     if(np.sum(currentState)==0):
         if(activePlayer.sideCOE==1):
-            winner=0
+            winner=-1
         else:
             winner=1
     #for i in range(0,16):
