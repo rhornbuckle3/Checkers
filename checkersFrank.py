@@ -85,11 +85,15 @@ class checkersFrank:
         #print(score)
         print('Training Player: '+str(self.sideCOE))
         print('State shape: '+str(stateSequence.shape[1]))
+        #lose condition for both sides if turn limit is reached. Still not sold on this one.
+        if(stateSequence.shape[1]>101):
+            winner=self.sideCOE*-1
+        winner=winner*self.sideCOE
         for i in range(1,stateSequence.shape[1]):
             predict=score[0,i]
             inputZero=np.copy(stateSequence[:,i])
             inputZero=inputZero*self.sideCOE
-            winner=winner*self.sideCOE
+            
             #inputZero=np.transpose(inputZero)
             #print("Learning state "+str(i)+" on player: "+str(self.sideCOE))
             prodOne=np.array(np.zeros((1,16)))
@@ -250,7 +254,8 @@ class checkersFrank:
                     farmSet.extend(newState)
         #if cur is a king
         if(cur==2):
-            if(iNum-1*self.sideCOE in range(0,8)):    
+            if(iNum-1*self.sideCOE in range(0,8)):
+                #there is an error with king movement of some sort that prevents them from moving out of the corners    
                 if(currentState[iNum-1*self.sideCOE,jOne]==0):
                     newState=np.copy(currentState)
                     newState[iNum,jNum]=0
@@ -276,9 +281,9 @@ class checkersFrank:
         curList=currentState.reshape((1,-1)).tolist()
         jOne,jTwo=self.rowRule(iNum,jNum)
         cur=currentState[iNum,jNum]
-
         if(cur>=1):
             if(iNum+2*self.sideCOE in range(0,8)):   
+                #checking if enemy piece in jumpable spot
                 if(currentState[iNum+1*self.sideCOE,jOne]<=-1):
                     #jOneCases
                     if(jOne>jTwo):

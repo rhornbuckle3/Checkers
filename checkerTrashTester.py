@@ -17,12 +17,9 @@ from checkersFrank import checkersFrank as cf
 #wTwo=np.array(np.random.standard_normal((16,1)))
 #game=np.array(np.zeros((1,1)))
 #np.savez("./Frank/bio-One.npz",wOne,wTwo,game)
-
-cg.initPlayer()
-cg.playBall()
-
-
-
-
-
-
+game=0
+while(True):
+    game+=1
+    print('Game: '+ str(game))
+    cg.initPlayer()
+    cg.playBall()
