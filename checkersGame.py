@@ -1,3 +1,8 @@
+#Russell Hornbuckle
+#2018-2019
+#checkers
+#In the process of moving and rewriting the state farmer over here from checkersFrank
+#will also likely transform this into a class and sever my reliance on globals
 import numpy as np
 import pandas as pd 
 import math as mt
@@ -7,13 +12,10 @@ defaultState=np.array((1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,-1,-1,-1,-1,-1,-1
 frankOne=None
 frankTwo=None
 activePlayer=None
-stateSequence=np.copy(defaultState)
-stateSequence=stateSequence.reshape((-1,1))
-stateScores=np.array(np.zeros((1,1)))
 #stateSequence=np.append(stateSequence,np.array([0]),axis=0)
-currentState=np.copy(defaultState)
+
 #sequence methods
-def addToSeq(newState,newScore):
+'''def addToSeq(newState,newScore):
         global stateSequence
         global stateScores
         newState=np.array(newState)
@@ -23,16 +25,25 @@ def addToSeq(newState,newScore):
         newState=newState.reshape((-1,1))
         #print(stateScores.shape)
         #print(newScore.shape)
-        stateSequence=np.append(stateSequence,newState,axis=1)
-        stateScores=np.append(stateScores,newScore,axis=1)
+        try: stateSequence=np.append(stateSequence,newState,axis=1)
+        except NameError:
+            stateSequence=np.copy(defaultState)
+            stateSequence=stateSequence.reshape((-1,1))
+            stateSequence=np.append(stateSequence,newState,axis=1)
+        try: stateScores=np.append(stateScores,newScore,axis=1)
+        except NameError:
+            stateScores=np.array(np.zeros((1,1)))
+            stateScores=np.append(stateScores,newScore,axis=1)
 def getStateSequence():
     global stateSequence
     return stateSequence
-
+'''
 #initialization
 def initPlayer():
     global activePlayer
     global frankOne
+    global currentState
+    currentState=np.copy(defaultState)
     #global currentState
     #global defaultState
     coinFlip=np.random.binomial(1,.5)
@@ -54,13 +65,13 @@ def initPlayer():
         activePlayer=frankOne
     #currentState=defaultState
 
+
 #Game manager
 def playBall():
-    global stateSequence
-    global currentState
     global frankOne
     global frankTwo
     global activePlayer
+    global currentState
     turn=1
     #print(frankOne.wOne)
     #print(frankOne.wTwo)
@@ -69,7 +80,6 @@ def playBall():
         #print(currentState)
         check=False
         newState,newScore=activePlayer.stateDecider(currentState)
-        addToSeq(newState,newScore)
         check=endGameCheck(newState)
         if(np.array_equal(currentState,newState)):
             if(activePlayer==frankOne):
@@ -97,7 +107,7 @@ def playBall():
             activePlayer=frankTwo
         else:
             activePlayer=frankOne
-        if(turn>100):
+        if(turn>120):
             count=np.sum(newState)
             if(count>0):
                 print("White Wins")
@@ -106,9 +116,9 @@ def playBall():
             frankOne.printState(newState)
             endGame()
             break
+        frankOne.printState(newState)
         currentState=newState
         turn=turn+1
-    #print(stateSequence.shape)
 
 #winner values:
 #white=1
@@ -116,8 +126,6 @@ def playBall():
 
 #game ending
 def endGameCheck(currentState):
-    global stateSequence
-    #global currentState
     global frankOne
     global frankTwo
     global activePlayer
@@ -128,15 +136,11 @@ def endGameCheck(currentState):
     if(mt.fabs(np.sum(currentState))==sumBum):
         return True
     return False
-    #playOne=frankOne.getStateSequence()
-    #playTwo=frankTwo.getStateSequence()
     #combine here, or just have each frank hold onto a complete state sequence, or handle state sequence in this one and record each turn
     #combining here would be the cool thing to do
     #recording here would be the elegant thing to do
 
 def endGame():
-    global stateSequence
-    global stateScores
     global currentState
     global frankOne
     global frankTwo
@@ -156,17 +160,18 @@ def endGame():
     #for i in range(0,16):
     #    print(frankOne.wOne[:,i])
     #print("new")
-    aOne,aTwo=frankOne.gradDesc(stateSequence,stateScores,winner)
+    aOne,aTwo=frankOne.gradDesc(winner)
     frankOne.saveWeights(aOne,aTwo)
     #print(aOne)
     #print(aTwo)
-    bOne,bTwo=frankTwo.gradDesc(stateSequence,stateScores,winner)
+    bOne,bTwo=frankTwo.gradDesc(winner)
     frankTwo.saveWeights(bOne,bTwo)
     del frankOne
     del frankTwo
-    del stateSequence
-    del stateScores
-    del currentState
     del activePlayer
     #print(stateSequence)
     #frankTwo.saveWeights(bOne,bTwo)
+
+def board_expand(board_state):
+    print(board_state)
+

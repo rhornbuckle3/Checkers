@@ -1,3 +1,7 @@
+#Russell Hornbuckle
+#2018-2019
+#checkers
+#currently in the process of moving and rewriting the state farming methods into checkersGame
 import numpy as np
 import pandas as pd 
 import math as mt 
@@ -9,6 +13,9 @@ class checkersFrank:
         self.wOne=np.array(np.zeros((32,16)))
         self.wTwo=np.array(np.zeros((16,1)))
         self.kingDex=np.array(np.zeros((12)))
+        self.stateSequence=np.copy(cG.defaultState)
+        self.stateSequence=self.stateSequence.reshape((-1,1))
+        self.stateScores=np.array(np.zeros((1,1)))
         #self.stateSequence=pd.DataFrame(cG.defaultState)
         #self.stateSequence=np.array(cG.defaultState)
         #self.stateSequence=self.stateSequence.reshape((-1,1))
@@ -17,6 +24,23 @@ class checkersFrank:
         self.sideCOE=0
         self.gameNum=None
         self.bioFile=None
+    def addToSeq(self,newState,newScore):
+        newState=np.array(newState)
+        newScore=np.array(newScore)
+        newScore=newScore.reshape((1,1))
+        #newState=np.append(newState,np.array(newScore))
+        newState=newState.reshape((-1,1))
+        #print(stateScores.shape)
+        #print(newScore.shape)
+        try: self.stateSequence=np.append(self.stateSequence,newState,axis=1)
+        except NameError:
+            self.stateSequence=np.copy(defaultState)
+            self.stateSequence=self.stateSequence.reshape((-1,1))
+            self.stateSequence=np.append(self.stateSequence,newState,axis=1)
+        try: self.stateScores=np.append(self.stateScores,newScore,axis=1)
+        except NameError:
+            self.stateScores=np.array(np.zeros((1,1)))
+            self.stateScores=np.append(self.stateScores,newScore,axis=1)
     def initWeights(self,bioPath):
         bio=np.load(bioPath)
         self.wOne=bio['arr_0']
@@ -58,14 +82,16 @@ class checkersFrank:
         return bingo
 
     def stateDecider(self,currentState):
+        currentState=currentState*self.sideCOE
         providedSet=self.stateProvider(currentState)
         stateValue=self.stateEvaluatorMaster(providedSet)
-        if(self.sideCOE==-1):
-            stateValue=stateValue*self.sideCOE
+        #if(self.sideCOE==-1):
+            #stateValue=stateValue*self.sideCOE
         if(str(stateValue)=='[]'):
             #print(providedSet)
             print(self.printState(currentState))
             print('Player '+str(self.sideCOE)+' Loses')
+            currentState
             return currentState, self.mainEvaluator(currentState,self.wOne,self.wTwo)
         else:
             best=np.argmax(stateValue)
@@ -76,22 +102,28 @@ class checkersFrank:
         #print('Player: '+str(self.sideCOE))
         #self.printState(newState)
         #print('Score: '+str(stateValue[best]))
+        self.addToSeq(newState,stateValue[best])
+        newState=newState*self.sideCOE
         return newState,stateValue[best]
 
-    def gradDesc(self,stateSequence,score,winner):
+    def gradDesc(self,winner):
         bOne=np.copy(self.wOne)
         bTwo=np.copy(self.wTwo)
         #print(stateSequence)
         #print(score)
         print('Training Player: '+str(self.sideCOE))
-        print('State shape: '+str(stateSequence.shape[1]))
+        print('State shape: '+str(self.stateSequence.shape[1]))
         #lose condition for both sides if turn limit is reached. Still not sold on this one.
-        if(stateSequence.shape[1]>101):
-            winner=self.sideCOE*-1
-        winner=winner*self.sideCOE
-        for i in range(1,stateSequence.shape[1]):
-            predict=score[0,i]
-            inputZero=np.copy(stateSequence[:,i])
+        #if(stateSequence.shape[1]>119):
+        #    winner=self.sideCOE*-1
+        #winner=winner*self.sideCOE
+        if(winner==self.sideCOE):
+            winner=1
+        else:
+            winner=-1
+        for i in range(1,self.stateSequence.shape[1]):
+            predict=self.stateScores[0,i]
+            inputZero=np.copy(self.stateSequence[:,i])
             inputZero=inputZero*self.sideCOE
             
             #inputZero=np.transpose(inputZero)
@@ -185,6 +217,7 @@ class checkersFrank:
             print(movey[j,:])
         
     def rowRule(self,iNum,jNum):
+        #for determining which movement rules a piece uses dependiong on its row
         q=iNum%2
         if(q==1):
             return jNum,jNum+1
@@ -192,9 +225,7 @@ class checkersFrank:
             return jNum,jNum-1
 
     def stateProvider(self,currentState):
-        if(self.sideCOE==-1):
-            currentState=currentState*self.sideCOE
-            #print(currentState)
+        #print(currentState)
         curList=currentState.tolist()
         currentState=currentState.reshape((8,4))
         workingSet=[]
@@ -213,13 +244,13 @@ class checkersFrank:
                     if(curList  in prioritySet):
                         del prioritySet[prioritySet.index(curList)]
         #print(workingSet)
-        if(self.sideCOE==-1):
-            for i in range(0,len(prioritySet)):
-                blarg=np.array(prioritySet[i])*self.sideCOE
-                prioritySet[i]=blarg.tolist()
-            for i in range(0,len(workingSet)):
-                blarg=np.array(workingSet[i])*self.sideCOE
-                workingSet[i]=blarg.tolist()
+        #if(self.sideCOE==-1):
+        #    for i in range(0,len(prioritySet)):
+        #        transfer_set=np.array(prioritySet[i])*self.sideCOE
+        #        prioritySet[i]=transfer_set.tolist()
+        #    for i in range(0,len(workingSet)):
+        #        transfer_set=np.array(workingSet[i])*self.sideCOE
+        #        workingSet[i]=transfer_set.tolist()
             #prioritySet=prioritySet*self.sideCOE
             #workingSet=workingSet*self.sideCOE
             #print(workingSet)
@@ -239,7 +270,8 @@ class checkersFrank:
                 newState=np.copy(currentState)
                 newState[iNum,jNum]=0
                 newState[iNum+1*self.sideCOE,jOne]=cur
-                if(((iNum+1*self.sideCOE==7)and(self.sideCOE==1))or((iNum+1*self.sideCOE==0)and(self.sideCOE==-1))):
+                #king me bit
+                if(((iNum+1==7)and(self.sideCOE==1))or((iNum-1==0)and(self.sideCOE==-1))):
                     newState[iNum,jNum]=2
                 newState=newState.reshape((1,-1)).tolist()
                 farmSet.extend(newState)
@@ -248,7 +280,8 @@ class checkersFrank:
                     newState=np.copy(currentState)
                     newState[iNum,jNum]=0
                     newState[iNum+1*self.sideCOE,jTwo]=cur
-                    if(((iNum+1*self.sideCOE==7)and(self.sideCOE==1))or((iNum+1*self.sideCOE==0)and(self.sideCOE==-1))):
+                    #king me bit
+                    if(((iNum+1==7)and(self.sideCOE==1))or((iNum-1==0)and(self.sideCOE==-1))):
                         newState[iNum,jNum]=2
                     newState=newState.reshape((1,-1)).tolist()
                     farmSet.extend(newState)
@@ -272,16 +305,17 @@ class checkersFrank:
                         if(((iNum+1*self.sideCOE==7)and(self.sideCOE==1))or((iNum+1*self.sideCOE==0)and(self.sideCOE==-1))):
                             newState[iNum,jNum]=2
                         newState=newState.reshape((1,-1)).tolist()
-                        farmSet.extend(newState)    
+                        farmSet.extend(newState)                  
         return farmSet
     def priorityStateFarmer(self,iNum,jNum,currentState,prioritySet):
         #Priority Move Checker
+        #the converter to king
         if(((iNum==7)and(self.sideCOE==1))or((iNum==0)and(self.sideCOE==-1))):
             currentState[iNum,jNum]=2
         curList=currentState.reshape((1,-1)).tolist()
         jOne,jTwo=self.rowRule(iNum,jNum)
         cur=currentState[iNum,jNum]
-        if(cur>=1):
+        if(cur>0):
             if(iNum+2*self.sideCOE in range(0,8)):   
                 #checking if enemy piece in jumpable spot
                 if(currentState[iNum+1*self.sideCOE,jOne]<=-1):
