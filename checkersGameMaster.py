@@ -1,7 +1,7 @@
 #Russell Hornbuckle
 #2018-2019
 #checkers
-#Currently in the process of overhauling and rewriting this project and as a result, it is a bit of a mess.
+#Currently in the process of overhauling and rewriting this project - as a result, it is a bit of a mess.
 import pandas as pd
 import numpy as np   
 import math as mt  
