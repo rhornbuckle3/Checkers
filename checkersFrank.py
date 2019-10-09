@@ -142,36 +142,25 @@ class checkersFrank:
             iterator=0
             while(True):
                 iterator+=1
-                #print("running upper "+str(iterator))
+                #second layer
                 checkTwo=np.copy(bTwo)
-                move=self.smallTwo(inputZero,predict,winner,prodOne,bOne,bTwo)
-                move=move*np.transpose(prodOne)
-                #print(bTwo)
-                #print(move)
-                bTwo=np.subtract(bTwo,learning_step*move)
+                gradient_upper=self.smallTwo(inputZero,predict,winner,prodOne,bOne,bTwo)
+                #gradient_upper - 16x1
+                gradient_upper=gradient_upper*np.transpose(prodOne)
                 weight_Diff=abs(checkTwo-bTwo)
+                checkOne=np.copy(bOne)
+                #first layer
+                gradient_lower=self.smallOne(inputZero,predict,winner,prodOne,bOne,bTwo)
+                #gradient_lower - 32x16
+                bOne=np.subtract(bOne,learning_step*gradient_upper)
+                bTwo=np.subtract(bTwo,learning_step*gradient_lower)
+                #weight_diff_two=abs(checkOne-bOne)
+                #weight_diff_two=weight_Diff.flatten()
                 #if(weight_Diff[np.argmax(weight_Diff)]<learning_check):
                 #    break
                 if(iterator>1500):
                     break
             iterator=0
-            #learning_check_two=1e-5
-            while(True):
-                iterator+=1
-                #print("running lower "+str(iterator))
-                checkOne=np.copy(bOne)
-                move=self.smallOne(inputZero,predict,winner,prodOne,bOne,bTwo)
-                #move - 32x16
-                #print(bOne)
-                bOne=np.subtract(bOne,learning_step*move)
-                weight_Diff=abs(checkOne-bOne)
-                weight_Diff=weight_Diff.flatten()
-                #if(weight_Diff[np.argmax(weight_Diff)]<learning_check_two):
-                #    break
-                if(iterator==1):
-                    break
-                if(iterator>1500):
-                    break
         return bOne, bTwo
     def activationOneD(self, neuronNum,inputZero,sOne,sTwo):
         inputZero=inputZero.reshape((-1,1))
