@@ -248,6 +248,10 @@ class checkersFrank:
         else:
             return workingSet
 
+
+
+
+    #while the functions below work, they don't work well and are prone to presenting the state deciders with invalid states - particularly in regards to king-ing pieces
     def StateFarmer(self,iNum,jNum,currentState):
         #Empty Move Checker
         farmSet=[]

@@ -112,9 +112,6 @@ def endGameCheck(currentState):
     if(mt.fabs(np.sum(currentState))==sumBum):
         return True
     return False
-    #combine here, or just have each frank hold onto a complete state sequence, or handle state sequence in this one and record each turn
-    #combining here would be the cool thing to do
-    #recording here would be the elegant thing to do
 
 def endGame():
     global currentState
@@ -153,7 +150,8 @@ def print_state(board_state):
     if(max(board_state.shape)<64):
         board_state=board_expand(board_state,False)
     board_state=board_state.reshape((8,8))
-    print(board_state)        
+    print(board_state)
+
 def board_expand(board_state,flatten):
     expanded_state=np.zeros((8,8))
     board_iterator=0
@@ -175,6 +173,7 @@ def board_expand(board_state,flatten):
         expanded_state=expanded_state.reshape((1,-1))
         return expanded_state
     return expanded_state
+
 def board_contract(board_state):
     contracted_state=np.zeros((1,32))
     board_iterator=0
@@ -190,6 +189,7 @@ def board_contract(board_state):
                 board_iterator=board_iterator+1
                 j=j+2
     print(contracted_state)
+
 #board should be multiplied by color coeff before being shipped here. The color coeff is passed for determining if a piece should be king'ed and movement directtion for 1's
 def state_farmer(board_state, color_coeff):
     move_set=[]
@@ -197,9 +197,12 @@ def state_farmer(board_state, color_coeff):
     board_state=board_expand(board_state,False)
     for i in range(0,8):
         for j in range(0,8):
-            if(board_state[i,j]==1):
-                #checking for valid moves here
+            if(board_state[i,j]==1 or board_state[i,j]==2):
+                #checking for valid forward moves here
                 move_set.append(check_moves(board_state,i,j,color_coeff,move_set))
+            if(board_state[i,j]==2):
+                #king moves
+                move_set.append(check_moves(board_state,i,j,color_coeff*-1,move_set))
     
     return move_set, jump_set
 
@@ -235,6 +238,4 @@ def check_moves(board_state,x,y,color_coeff,move_set):
             prospect_board[x-1,y-1*color_coeff]=2
         move_set.append(prospect_board)
     return move_set
-def check_moves_king(board_state,x,y,color_coeff,move_set):
-    #like check moves but 
-    pass
+#some of the prospect boards are being added wrapped in an array -- needs to be fixed.
