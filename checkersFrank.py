@@ -3,7 +3,6 @@
 #checkers
 #currently in the process of moving and rewriting the state farming methods into checkersGame
 import numpy as np
-import pandas as pd 
 import math as mt 
 import checkersGame as cG
 #checkers-Act

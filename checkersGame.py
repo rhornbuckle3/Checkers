@@ -3,7 +3,6 @@
 #checkers
 #In the process of moving and rewriting the state farmer over here from checkersFrank
 import numpy as np
-import pandas as pd 
 import math as mt
 from checkersFrank import checkersFrank as cf
 defaultState=np.array((1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1))

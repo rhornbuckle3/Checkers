@@ -6,18 +6,12 @@
 #RULES
 #Original (one piece takes a single other piece) jumps are compulsory, secondary (takes two pieces) and more jumps are not.
 #Black goes first
-#Game will end in the favor of whoever has a higher score at 101 turns
+#Game will end in the favor of whoever has a higher score at 121 turns
 #Score is determined by the pieces remaining for each player: kings are 2, regular pieces are 1
 
 
-
-
-
-import pandas as pd
 import numpy as np   
-import math as mt  
 import checkersGame as cg 
-import pickle as pk
 from checkersFrank import checkersFrank as cf
 
 
