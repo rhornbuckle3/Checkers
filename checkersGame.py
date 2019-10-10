@@ -241,7 +241,7 @@ def check_moves(board_state,x,y,color_coeff):
         prospect_board=np.copy(board_state)
         prospect_board[x,y]=0
         if(board_state[x,y]==1):
-            if((x==0 and color_coeff==-1)or(x==7 and color_coeff==1)):
+            if(((x+1*color_coeff)==0 and color_coeff==-1)or((x+1*color_coeff)==7 and color_coeff==1)):
                 prospect_board[x+1*color_coeff,y+1]=2
             else: 
                 prospect_board[x+1*color_coeff,y+1]=1
@@ -256,7 +256,7 @@ def check_moves(board_state,x,y,color_coeff):
         prospect_board=np.copy(board_state)
         prospect_board[x,y]=0
         if(board_state[x,y]==1):
-            if((x==0 and color_coeff==-1)or(x==7 and color_coeff==1)):
+            if(((x+1*color_coeff)==0 and color_coeff==-1)or((x+1*color_coeff)==7 and color_coeff==1)):
                 prospect_board[x+1*color_coeff,y-1]=2
             else: 
                 prospect_board[x+1*color_coeff,y-1]=1
@@ -280,7 +280,7 @@ def check_jumps(board_state,x,y,color_coeff,move_set):
                 prospect_board[x+1*color_coeff,y+1]=0
                 prospect_board[x+2*color_coeff,y+2]=board_state[x,y]            
                 if(board_state[x,y]==1):
-                    if((x==0 and color_coeff==-1)or(x==7 and color_coeff==1)):
+                    if(((x+2*color_coeff)==0 and color_coeff==-1)or((x+2*color_coeff)==7 and color_coeff==1)):
                         prospect_board[x+2*color_coeff,y+2]=2
                     else: 
                         prospect_board[x+2*color_coeff,y+2]=1
@@ -307,8 +307,7 @@ def check_jumps(board_state,x,y,color_coeff,move_set):
                 prospect_board[x+1*color_coeff,y-1]=0
                 prospect_board[x+2*color_coeff,y-2]=board_state[x,y]            
                 if(board_state[x,y]==1):
-                    if((x==0 and color_coeff==-1)or(x==7 and color_coeff==1)):
-                        print("KINGME")
+                    if(((x+2*color_coeff)==0 and color_coeff==-1)or((x+2*color_coeff)==7 and color_coeff==1)):
                         prospect_board[x+2*color_coeff,y-2]=2
                     else: 
                         prospect_board[x+2*color_coeff,y-2]=1
