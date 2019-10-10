@@ -55,10 +55,10 @@ class checkersFrank:
         if(side==1):
             self.sideCOE=1
 
-    def stateEvaluatorMaster(self,providedSet):
-        stateValue=np.array(np.zeros(len(providedSet)))
+    def stateEvaluatorMaster(self,provided_set):
+        stateValue=np.array(np.zeros(len(provided_set)))
         for i in range(0,stateValue.shape[0]):
-            stateValue[i]=self.mainEvaluator(providedSet[i],self.wOne,self.wTwo)
+            stateValue[i]=self.mainEvaluator(provided_set[i],self.wOne,self.wTwo)
         return stateValue
 
     def mainEvaluator(self,potState,sOne,sTwo):
@@ -83,22 +83,23 @@ class checkersFrank:
 
     def stateDecider(self,currentState):
         currentState=currentState*self.sideCOE
-        providedSet=self.stateProvider(currentState)
-        stateValue=self.stateEvaluatorMaster(providedSet)
+        #provided_set=self.stateProvider(currentState)
+        provided_set=cG.state_farmer(currentState)
+        stateValue=self.stateEvaluatorMaster(provided_set)
         #if(self.sideCOE==-1):
             #stateValue=stateValue*self.sideCOE
         if(str(stateValue)=='[]'):
-            #print(providedSet)
+            #print(provided_set)
             print(self.printState(currentState))
             print('Player '+str(self.sideCOE)+' Loses')
             currentState
             return currentState, self.mainEvaluator(currentState,self.wOne,self.wTwo)
         else:
             best=np.argmax(stateValue)
-        #self.addToSeq(providedSet[range(32*best,32*best+32)],stateValue[best])
-        #self.addToSeq(providedSet[best],stateValue[best])
+        #self.addToSeq(provided_set[range(32*best,32*best+32)],stateValue[best])
+        #self.addToSeq(provided_set[best],stateValue[best])
         #print('state values: '+str(stateValue))
-        newState=np.array(providedSet[best])
+        newState=np.array(provided_set[best])
         #print('Player: '+str(self.sideCOE))
         #self.printState(newState)
         #print('Score: '+str(stateValue[best]))
@@ -125,20 +126,10 @@ class checkersFrank:
             predict=self.stateScores[0,i]
             inputZero=np.copy(self.stateSequence[:,i])
             inputZero=inputZero*self.sideCOE
-            
-            #inputZero=np.transpose(inputZero)
-            #print("Learning state "+str(i)+" on player: "+str(self.sideCOE))
             prodOne=np.array(np.zeros((1,16)))
             for j in range(0,prodOne.shape[1]):
                 prodOne[0,j]=self.activationOne(j,inputZero,bOne)
             learning_step=1e-2
-            #learning_check=1e-3
-            #print("upper weights")
-            #print('Move inputs here')
-            #print(inputZero)
-            #print('score is '+str(predict))
-            #print('winner is side: '+str(winner)+'; 0 is black, 1 is white')
-            #print(prodOne)
             iterator=0
             while(True):
                 iterator+=1
@@ -158,7 +149,7 @@ class checkersFrank:
                 #weight_diff_two=weight_Diff.flatten()
                 #if(weight_Diff[np.argmax(weight_Diff)]<learning_check):
                 #    break
-                if(iterator>1500):
+                if(iterator>1000):
                     break
             iterator=0
         return bOne, bTwo
@@ -213,6 +204,8 @@ class checkersFrank:
         else:
             return jNum,jNum-1
 
+    #everything below is deprecated
+
     def stateProvider(self,currentState):
         #print(currentState)
         curList=currentState.tolist()
@@ -232,26 +225,10 @@ class checkersFrank:
                     prioritySet.extend(self.priorityStateFarmer(i,j,currentState,laughingSet))
                     if(curList  in prioritySet):
                         del prioritySet[prioritySet.index(curList)]
-        #print(workingSet)
-        #if(self.sideCOE==-1):
-        #    for i in range(0,len(prioritySet)):
-        #        transfer_set=np.array(prioritySet[i])*self.sideCOE
-        #        prioritySet[i]=transfer_set.tolist()
-        #    for i in range(0,len(workingSet)):
-        #        transfer_set=np.array(workingSet[i])*self.sideCOE
-        #        workingSet[i]=transfer_set.tolist()
-            #prioritySet=prioritySet*self.sideCOE
-            #workingSet=workingSet*self.sideCOE
-            #print(workingSet)
         if(len(prioritySet)>0):
             return prioritySet
         else:
-            return workingSet
-
-
-
-
-    #while the functions below work, they don't work well and are prone to presenting the state deciders with invalid states - particularly in regards to king-ing pieces
+            return workingSet    
     def StateFarmer(self,iNum,jNum,currentState):
         #Empty Move Checker
         farmSet=[]

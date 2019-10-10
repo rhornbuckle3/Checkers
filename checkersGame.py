@@ -35,7 +35,7 @@ def initPlayer():
     frankTwo=cf()
     frankTwo.setSide(coinFlip)
     frankTwo.initWeights("./Frank/bio-Two.npz")
-    if(coinFlip==0):
+    if(coinFlip==1):
         activePlayer=frankTwo
     else:
         activePlayer=frankOne
@@ -200,30 +200,36 @@ def state_farmer(board_state, color_coeff):
             if(board_state[i,j]==1 or board_state[i,j]==2):
                 #checking for valid forward moves here
                 move_set.append(check_moves(board_state,i,j,color_coeff,move_set))
+                jump_set.append(check_jumps(board_state,i,j,color_coeff,jump_set))
             if(board_state[i,j]==2):
                 #king moves
                 move_set.append(check_moves(board_state,i,j,color_coeff*-1,move_set))
-    
-    return move_set, jump_set
+                jump_set.append(check_jumps(board_state,i,j,color_coeff*-1,jump_set))  
+    if(len(jump_set)>0):
+        return jump_set
+    else:  
+        return move_set
 
 def check_moves(board_state,x,y,color_coeff,move_set):
     prospect=None
-    try: prospect=board_state[x+1,y-1*color_coeff]
+    try: prospect=board_state[x+1*color_coeff,y+1]
     except IndexError:
+        print("Index Error")
         pass
     if(prospect==0):
+        print("Here is here "+str(x)+" "+str(y))
         prospect_board=np.copy(board_state)
         prospect_board[x,y]=0
         if(board_state[x,y]==1):
             if((x==0 and color_coeff==-1)or(x==7 and color_coeff==1)):
-                prospect_board[x+1,y-1*color_coeff]=2
+                prospect_board[x+1*color_coeff,y+1]=2
             else: 
-                prospect_board[x+1,y-1*color_coeff]=1
+                prospect_board[x+1*color_coeff,y+1]=1
         else:
-            prospect_board[x+1,y-1*color_coeff]=2
+            prospect_board[x+1*color_coeff,y+1]=2
         move_set.append(prospect_board)
     prospect=None
-    try: prospect=board_state[x-1,y-1*color_coeff]
+    try: prospect=board_state[x+1*color_coeff,y-1]
     except IndexError:
         pass
     if(prospect==0):
@@ -231,11 +237,50 @@ def check_moves(board_state,x,y,color_coeff,move_set):
         prospect_board[x,y]=0
         if(board_state[x,y]==1):
             if((x==0 and color_coeff==-1)or(x==7 and color_coeff==1)):
-                prospect_board[x-1,y-1*color_coeff]=2
+                prospect_board[x+1*color_coeff,y-1]=2
             else: 
-                prospect_board[x-1,y-1*color_coeff]=1
+                prospect_board[x+1*color_coeff,y-1]=1
         else:
-            prospect_board[x-1,y-1*color_coeff]=2
+            prospect_board[x+1*color_coeff,y-1]=2
         move_set.append(prospect_board)
     return move_set
+
+def check_jumps(board_state,x,y,color_coeff,move_set):
+    prospect=None
+    prospect_board=np.copy(board_state)
+    if(not(x+2>7)):
+        if(board_state[x+1*color_coeff,y+1]==-1 or board_state[x+1*color_coeff,y+1]==-2):
+            if(board_state[x+2*color_coeff,y+2]==0):
+                prospect_board[x,y]=0
+                prospect_board[x+1*color_coeff,y+1]=0
+                prospect_board[x+2*color_coeff,y+2]=board_state[x,y]            
+                if(board_state[x,y]==1):
+                    if((x==0 and color_coeff==-1)or(x==7 and color_coeff==1)):
+                        prospect_board[x+2*color_coeff,y+2]=2
+                    else: 
+                        prospect_board[x+2*color_coeff,y+2]=1
+                else:
+                    prospect_board[x+2*color_coeff,y+2]=2
+                move_set.append(prospect_board)
+                #recursion for multi jumps
+                move_ser.append(check_jumps(prospect_board,x+2*color_coeff,y+2,color_coeff,[]))
+    if(not(x-2<0)):
+        if(board_state[x+1*color_coeff,y+1]==-1 or board_state[x+1*color_coeff,y+1]==-2):
+            if(board_state[x+2*color_coeff,y-2]==0):
+                prospect_board[x,y]=0
+                prospect_board[x+1*color_coeff,y-1]=0
+                prospect_board[x+2*color_coeff,y-2]=board_state[x,y]            
+                if(board_state[x,y]==1):
+                    if((x==0 and color_coeff==-1)or(x==7 and color_coeff==1)):
+                        prospect_board[x+2*color_coeff,y-2]=2
+                    else: 
+                        prospect_board[x+2*color_coeff,y-2]=1
+                else:
+                    prospect_board[x+2*color_coeff,y-2]=2
+                
+                move_set.append(prospect_board)
+                #recursion for multi jumps
+                move_ser.append(check_jumps(prospect_board,x+2*color_coeff,y-2,color_coeff,[]))
+    return move_set
+#need to write the rules somewhere
 #some of the prospect boards are being added wrapped in an array -- needs to be fixed.
