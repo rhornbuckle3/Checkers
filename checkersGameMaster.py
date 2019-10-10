@@ -20,6 +20,7 @@ import checkersGame as cg
 import pickle as pk
 from checkersFrank import checkersFrank as cf
 
+
 #remove triple quotes below to reset weights (or add them to not reset weights)
 '''
 wOne=np.array(np.random.standard_normal((32,16)))
@@ -55,9 +56,11 @@ cg.playBall()
 
 #cg.print_state(cg.defaultState)
 #cg.board_contract(cg.board_expand(cg.defaultState,False))
-#move_set,jump_set=cg.state_farmer(cg.defaultState,1)
+#move_set=cg.state_farmer(cg.defaultState,1)
 #for i in range(0,len(move_set)):
-#    print(type(move_set[i]))
+#    print(move_set[i])
+#    type_board=move_set[i]
+#    print(type(cg.board_expand(type_board[0],False)))
 
 #14.5
 #9.7

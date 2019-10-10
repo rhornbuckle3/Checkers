@@ -70,8 +70,7 @@ class checkersFrank:
     
     def activationOne(self,neuronNum,inputZero,sOne):
         inputZero=inputZero.reshape((-1,1))
-        bingo=1/(1+mt.e**(np.matmul(sOne[:,neuronNum],inputZero)*-1))
-        return bingo
+        return 1/(1+mt.e**(np.matmul(sOne[:,neuronNum],inputZero)*-1))
         #return mt.log((1+mt.e**np.matmul(sOne[:,neuronNum],inputZero)))
 
     def activationTwo(self,inputOne,sTwo):
@@ -84,25 +83,23 @@ class checkersFrank:
     def stateDecider(self,currentState):
         currentState=currentState*self.sideCOE
         #provided_set=self.stateProvider(currentState)
-        provided_set=cG.state_farmer(currentState)
+        provided_set=cG.state_farmer(currentState,self.sideCOE)
+        #for sub_set in provided_set:
+           #for board in sub_set:
+                #for sub in board:
+                    #print(sub)
         stateValue=self.stateEvaluatorMaster(provided_set)
         #if(self.sideCOE==-1):
             #stateValue=stateValue*self.sideCOE
         if(str(stateValue)=='[]'):
             #print(provided_set)
-            print(self.printState(currentState))
+            print(cG.print_state(currentState))
             print('Player '+str(self.sideCOE)+' Loses')
             currentState
             return currentState, self.mainEvaluator(currentState,self.wOne,self.wTwo)
         else:
             best=np.argmax(stateValue)
-        #self.addToSeq(provided_set[range(32*best,32*best+32)],stateValue[best])
-        #self.addToSeq(provided_set[best],stateValue[best])
-        #print('state values: '+str(stateValue))
         newState=np.array(provided_set[best])
-        #print('Player: '+str(self.sideCOE))
-        #self.printState(newState)
-        #print('Score: '+str(stateValue[best]))
         self.addToSeq(newState,stateValue[best])
         newState=newState*self.sideCOE
         return newState,stateValue[best]
@@ -134,21 +131,15 @@ class checkersFrank:
             while(True):
                 iterator+=1
                 #second layer
-                checkTwo=np.copy(bTwo)
                 gradient_upper=self.smallTwo(inputZero,predict,winner,prodOne,bOne,bTwo)
                 #gradient_upper - 16x1
                 gradient_upper=gradient_upper*np.transpose(prodOne)
-                weight_Diff=abs(checkTwo-bTwo)
                 checkOne=np.copy(bOne)
                 #first layer
                 gradient_lower=self.smallOne(inputZero,predict,winner,prodOne,bOne,bTwo)
                 #gradient_lower - 32x16
-                bOne=np.subtract(bOne,learning_step*gradient_upper)
-                bTwo=np.subtract(bTwo,learning_step*gradient_lower)
-                #weight_diff_two=abs(checkOne-bOne)
-                #weight_diff_two=weight_Diff.flatten()
-                #if(weight_Diff[np.argmax(weight_Diff)]<learning_check):
-                #    break
+                bOne=np.subtract(bOne,learning_step*gradient_lower)
+                bTwo=np.subtract(bTwo,learning_step*gradient_upper)
                 if(iterator>1000):
                     break
             iterator=0
@@ -177,243 +168,3 @@ class checkersFrank:
         #print('cost: '+str(self.mainEvaluator(currentState,sOne,sTwo)))
         result=np.multiply(((self.mainEvaluator(currentState,sOne,sTwo)-winner)*((mt.e**self.mainEvaluator(currentState,sOne,sTwo))/((1+mt.e**self.mainEvaluator(currentState,sOne,sTwo))**2))),(1/(1+mt.e**(self.mainEvaluator(currentState,sOne,sTwo)*-1))))
         return result
-
-    def printMoves(self, currentState):
-        moveset=self.stateProvider(currentState)
-        print(len(moveset))
-        for i in range(0,len(moveset)):
-            movey=np.array(moveset[i])
-            movey=movey.reshape((8,4))            
-            print(i,end='')
-            print(":")
-            for j in range(7,-1,-1):
-                print(movey[j,:])
-
-    def printState(self,currentState):
-        movey=currentState
-        movey=movey.reshape((8,4))            
-        print("State:")
-        for j in range(7,-1,-1):
-            print(movey[j,:])
-        
-    def rowRule(self,iNum,jNum):
-        #for determining which movement rules a piece uses dependiong on its row
-        q=iNum%2
-        if(q==1):
-            return jNum,jNum+1
-        else:
-            return jNum,jNum-1
-
-    #everything below is deprecated
-
-    def stateProvider(self,currentState):
-        #print(currentState)
-        curList=currentState.tolist()
-        currentState=currentState.reshape((8,4))
-        workingSet=[]
-        prioritySet=[]
-        #prioritySet.extend(curList)
-        for i in range(0,8):
-            for j in range(0,4):
-                if(currentState[i,j]>0):
-                    stateF=self.StateFarmer(i,j,currentState)
-                    if(not(stateF)):
-                        pass
-                    else:
-                        workingSet.extend(stateF)
-                    laughingSet=[]
-                    prioritySet.extend(self.priorityStateFarmer(i,j,currentState,laughingSet))
-                    if(curList  in prioritySet):
-                        del prioritySet[prioritySet.index(curList)]
-        if(len(prioritySet)>0):
-            return prioritySet
-        else:
-            return workingSet    
-    def StateFarmer(self,iNum,jNum,currentState):
-        #Empty Move Checker
-        farmSet=[]
-        #cur is the current space being checked for pieces
-        cur=currentState[iNum,jNum]
-        jOne,jTwo=self.rowRule(iNum,jNum)
-        if(iNum+1*self.sideCOE in range(0,8)):    
-            if(currentState[iNum+1*self.sideCOE,jOne]==0):
-                newState=np.copy(currentState)
-                newState[iNum,jNum]=0
-                newState[iNum+1*self.sideCOE,jOne]=cur
-                #king me bit
-                if(((iNum+1==7)and(self.sideCOE==1))or((iNum-1==0)and(self.sideCOE==-1))):
-                    newState[iNum,jNum]=2
-                newState=newState.reshape((1,-1)).tolist()
-                farmSet.extend(newState)
-            if(jTwo in range(0,4)):
-                if(currentState[iNum+1*self.sideCOE,jTwo]==0):
-                    newState=np.copy(currentState)
-                    newState[iNum,jNum]=0
-                    newState[iNum+1*self.sideCOE,jTwo]=cur
-                    #king me bit
-                    if(((iNum+1==7)and(self.sideCOE==1))or((iNum-1==0)and(self.sideCOE==-1))):
-                        newState[iNum,jNum]=2
-                    newState=newState.reshape((1,-1)).tolist()
-                    farmSet.extend(newState)
-        #if cur is a king
-        if(cur==2):
-            if(iNum-1*self.sideCOE in range(0,8)):
-                #there is an error with king movement of some sort that prevents them from moving out of the corners    
-                if(currentState[iNum-1*self.sideCOE,jOne]==0):
-                    newState=np.copy(currentState)
-                    newState[iNum,jNum]=0
-                    newState[iNum-1*self.sideCOE,jOne]=cur
-                    if(((iNum+1*self.sideCOE==7)and(self.sideCOE==1))or((iNum+1*self.sideCOE==0)and(self.sideCOE==-1))):
-                        newState[iNum,jNum]=2
-                    newState=newState.reshape((1,-1)).tolist()
-                    farmSet.extend(newState)
-                if(jTwo in range(0,4)):
-                    if(currentState[iNum-1*self.sideCOE,jTwo]==0):
-                        newState=np.copy(currentState)
-                        newState[iNum,jNum]=0
-                        newState[iNum-1*self.sideCOE,jTwo]=cur
-                        if(((iNum+1*self.sideCOE==7)and(self.sideCOE==1))or((iNum+1*self.sideCOE==0)and(self.sideCOE==-1))):
-                            newState[iNum,jNum]=2
-                        newState=newState.reshape((1,-1)).tolist()
-                        farmSet.extend(newState)                  
-        return farmSet
-    def priorityStateFarmer(self,iNum,jNum,currentState,prioritySet):
-        #Priority Move Checker
-        #the converter to king
-        if(((iNum==7)and(self.sideCOE==1))or((iNum==0)and(self.sideCOE==-1))):
-            currentState[iNum,jNum]=2
-        curList=currentState.reshape((1,-1)).tolist()
-        jOne,jTwo=self.rowRule(iNum,jNum)
-        cur=currentState[iNum,jNum]
-        if(cur>0):
-            if(iNum+2*self.sideCOE in range(0,8)):   
-                #checking if enemy piece in jumpable spot
-                if(currentState[iNum+1*self.sideCOE,jOne]<=-1):
-                    #jOneCases
-                    if(jOne>jTwo):
-                        if(jOne+1 in range(0,4)):
-                            if(currentState[iNum+2*self.sideCOE,jOne+1]==0):
-                                newState=np.copy(currentState)
-                                newState[iNum,jNum]=0
-                                newState[iNum+1*self.sideCOE,jOne]=0
-                                newState[iNum+2*self.sideCOE,jOne+1]=cur
-                                newStateSet=[newState.reshape((1,-1)).tolist()]
-                                
-                                if(curList  in prioritySet):
-                                    #print("here")
-                                    del prioritySet[prioritySet.index(curList)]
-                                    #removeCurrentStateFromPrioritySet
-                                prioritySet.extend(self.priorityStateFarmer(iNum+2*self.sideCOE,jOne+1,newState,newStateSet))
-                                #newStateFuncwithRecursion
-                    else:
-                        if(jOne-1 in range(0,4)):
-                            if(currentState[iNum+2*self.sideCOE,jOne-1]==0):
-                                newState=np.copy(currentState)
-                                newState[iNum,jNum]=0
-                                newState[iNum+1*self.sideCOE,jOne]=0
-                                newState[iNum+2*self.sideCOE,jOne-1]=cur
-                                newStateSet=[newState.reshape((1,-1)).tolist()]
-                                
-                                if(curList in prioritySet):
-                                    #print("here")
-                                    del prioritySet[prioritySet.index(curList)]
-                                    #removeCurrentStateFromPrioritySet
-                                prioritySet.extend(self.priorityStateFarmer(iNum+2*self.sideCOE,jOne-1,newState,newStateSet))
-                                #newStateFuncwithRecursion
-                if(jTwo in range(0,4)):
-                    #jTwoCases
-                    if(currentState[iNum+1*self.sideCOE,jTwo]<=-1):
-                        if(jOne>jTwo):
-                            if(currentState[iNum+2*self.sideCOE,jTwo]==0):
-                                newState=np.copy(currentState)
-                                newState[iNum,jNum]=0
-                                newState[iNum+1*self.sideCOE,jTwo]=0
-                                newState[iNum+2*self.sideCOE,jTwo]=cur
-                                newStateSet=[newState.reshape((1,-1)).tolist()]
-                                
-                                if(curList  in prioritySet):
-                                    #print("here")
-                                    del prioritySet[prioritySet.index(curList)]
-                                    #removeCurrentStateFromPrioritySet
-                                prioritySet.extend(self.priorityStateFarmer(iNum+2*self.sideCOE,jTwo,newState,newStateSet))
-                                #newStateFuncwithRecursion
-                        else:
-                            #if(jTwo in range(0,4)):
-                            if(currentState[iNum+2*self.sideCOE,jTwo]==0):
-                                newState=np.copy(currentState)
-                                newState[iNum,jNum]=0
-                                newState[iNum+1*self.sideCOE,jTwo]=0
-                                newState[iNum+2*self.sideCOE,jTwo]=cur
-                                newStateSet=[newState.reshape((1,-1)).tolist()]
-                                
-                                if(curList  in prioritySet):
-                                    #print("here")
-                                    del prioritySet[prioritySet.index(curList)]
-                                #removeCurrentStateFromPrioritySet
-                                prioritySet.extend(self.priorityStateFarmer(iNum+2*self.sideCOE,jTwo,newState,newStateSet))
-                                #newStateFuncwithRecursion
-            if(cur==2):
-                if(iNum-2*self.sideCOE in range(0,8)):
-                    if(currentState[iNum-1*self.sideCOE,jOne]<=-1):
-                        #jOneCases
-                        if(jOne>jTwo):
-                            if(jOne+1 in range(0,4)):
-                                if(currentState[iNum-2*self.sideCOE,jOne+1]==0):
-                                    newState=np.copy(currentState)
-                                    newState[iNum,jNum]=0
-                                    newState[iNum-1*self.sideCOE,jOne]=0
-                                    newState[iNum-2*self.sideCOE,jOne+1]=cur
-                                    newStateSet=[newState.reshape((1,-1)).tolist()]
-                                    
-                                    if(curList  in prioritySet):
-                                        del prioritySet[prioritySet.index(curList)]
-                                    #removeCurrentStateFromPrioritySet
-                                    prioritySet.extend(self.priorityStateFarmer(iNum-2*self.sideCOE,jOne+1,newState,newStateSet))
-                                    #newStateFuncwithRecursion
-                        else:
-                            if(jOne-1 in range(0,4)):
-                                if(currentState[iNum-2*self.sideCOE,jOne-1]==0):
-                                    newState=np.copy(currentState)
-                                    newState[iNum,jNum]=0
-                                    newState[iNum-1*self.sideCOE,jOne]=0
-                                    newState[iNum-2*self.sideCOE,jOne-1]=cur
-                                    newStateSet=[newState.reshape((1,-1)).tolist()]
-                                    
-                                    if(curList  in prioritySet):
-                                        del prioritySet[prioritySet.index(curList)]
-                                        #removeCurrentStateFromPrioritySet
-                                    prioritySet.extend(self.priorityStateFarmer(iNum-2*self.sideCOE,jOne-1,newState,newStateSet))
-                                    #newStateFuncwithRecursion
-                    if(jTwo in range(0,4)):
-                        #jTwoCases
-                        if(currentState[iNum-1*self.sideCOE,jTwo]<=-1):
-                            if(jOne>jTwo):
-                                if(currentState[iNum-2*self.sideCOE,jTwo]==0):
-                                    #newStateFuncwithRecursion
-                                    newState=np.copy(currentState)
-                                    newState[iNum,jNum]=0
-                                    newState[iNum-1*self.sideCOE,jTwo]=0
-                                    newState[iNum-2*self.sideCOE,jTwo]=cur
-                                    newStateSet=[newState.reshape((1,-1)).tolist()]
-                                    
-                                    if(curList  in prioritySet):
-                                        del prioritySet[prioritySet.index(curList)]
-                                    #removeCurrentStateFromPrioritySet
-                                    prioritySet.extend(self.priorityStateFarmer(iNum-2*self.sideCOE,jTwo,newState,newStateSet))
-                            else:
-                                if(jTwo+1 in range(0,4)):
-                                    if(currentState[iNum-2*self.sideCOE,jTwo]==0):
-                                        newState=np.copy(currentState)
-                                        newState[iNum,jNum]=0
-                                        newState[iNum-1*self.sideCOE,jTwo]=0
-                                        newState[iNum-2*self.sideCOE,jTwo]=cur
-                                        newStateSet=[newState.reshape((1,-1)).tolist()]
-                                        
-                                        if(curList in prioritySet):
-                                            #print("here")
-                                            del prioritySet[prioritySet.index(curList)]
-                                    #removeCurrentStateFromPrioritySet
-                                        prioritySet.extend(self.priorityStateFarmer(iNum-2*self.sideCOE,jTwo,newState,newStateSet))
-                                        #newStateFuncwithRecursion
-            return prioritySet
-    
