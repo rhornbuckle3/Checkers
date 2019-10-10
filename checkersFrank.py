@@ -16,10 +16,6 @@ class checkersFrank:
         self.stateSequence=np.copy(cG.defaultState)
         self.stateSequence=self.stateSequence.reshape((-1,1))
         self.stateScores=np.array(np.zeros((1,1)))
-        #self.stateSequence=pd.DataFrame(cG.defaultState)
-        #self.stateSequence=np.array(cG.defaultState)
-        #self.stateSequence=self.stateSequence.reshape((-1,1))
-        #self.stateSequence=np.append(self.stateSequence,0,axis=0)
         self.side=None
         self.sideCOE=0
         self.gameNum=None
@@ -28,10 +24,7 @@ class checkersFrank:
         newState=np.array(newState)
         newScore=np.array(newScore)
         newScore=newScore.reshape((1,1))
-        #newState=np.append(newState,np.array(newScore))
         newState=newState.reshape((-1,1))
-        #print(stateScores.shape)
-        #print(newScore.shape)
         try: self.stateSequence=np.append(self.stateSequence,newState,axis=1)
         except NameError:
             self.stateSequence=np.copy(defaultState)
@@ -71,14 +64,11 @@ class checkersFrank:
     def activationOne(self,neuronNum,inputZero,sOne):
         inputZero=inputZero.reshape((-1,1))
         return 1/(1+mt.e**(np.matmul(sOne[:,neuronNum],inputZero)*-1))
-        #return mt.log((1+mt.e**np.matmul(sOne[:,neuronNum],inputZero)))
 
     def activationTwo(self,inputOne,sTwo):
         inputOne=inputOne.reshape((-1,1)) 
-        #bingo=mt.log((1+mt.e**np.matmul(self.wTwo[:,0],inputOne)))
-        bingo=1/(1+mt.e**(np.matmul(sTwo[:,0],inputOne)*-1))
-        #print(bingo)
-        return bingo
+        return 1/(1+mt.e**(np.matmul(sTwo[:,0],inputOne)*-1))
+
 
     def stateDecider(self,currentState):
         currentState=currentState*self.sideCOE
@@ -150,8 +140,7 @@ class checkersFrank:
         shapeTest=sOne[:,neuronNum].reshape((-1,1))
         shapeTest=np.transpose(shapeTest)
         sigmoid=self.activationOne(neuronNum,inputZero,sOne)
-        bingo=sigmoid*(1-sigmoid)
-        return bingo
+        return sigmoid*(1-sigmoid)
 
     def smallOne(self,currentState,score,winner,prodOne,sOne,sTwo):
         #result=np.array(np.zeros((1,16)))
