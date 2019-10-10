@@ -45,9 +45,17 @@ while(True):
     cg.playBall()
 '''
 
+cg.initPlayer()
+cg.playBall()
+
+
+
+
+
+
 #cg.print_state(cg.defaultState)
 #cg.board_contract(cg.board_expand(cg.defaultState,False))
-move_set,jump_set=cg.state_farmer(cg.defaultState,1)
+#move_set,jump_set=cg.state_farmer(cg.defaultState,1)
 #for i in range(0,len(move_set)):
 #    print(type(move_set[i]))
 
