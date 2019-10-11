@@ -30,16 +30,16 @@ cg.playBall()
 '''
 
 
-#remove triple quotes to play a series of games -- there appears to be a garbage collection issue here
 '''
+
 game=0
 while(True):
     game+=1
     print('Game: '+ str(game))
     cg.initPlayer()
     cg.playBall()
-'''
 
+'''
 cg.initPlayer()
 cg.playBall()
 

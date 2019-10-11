@@ -91,7 +91,7 @@ def playBall():
             print_state(newState)
             endGame()
             break
-        print_state(newState)
+        #print_state(newState)
         currentState=newState
         turn=turn+1
 
@@ -216,10 +216,7 @@ def state_farmer(board_state, color_coeff):
                 prospect_set=check_moves(board_state,i,j,color_coeff*-1)
                 for board in prospect_set:
                     if(not(board==[])):
-                        move_set.append(board)
-                #print("Move set here: ")
-                #print(move_set)
-                #jump_set.append(check_jumps(board_state,i,j,color_coeff*-1,jump_set))  
+                        move_set.append(board) 
                 prospect_set=check_jumps(board_state,i,j,color_coeff*-1,[])
                 for board in prospect_set:
                     if(not(board==[])):
@@ -323,5 +320,3 @@ def check_jumps(board_state,x,y,color_coeff,move_set):
                         else:
                             new_set.append(prospect_recursive)
     return new_set
-#need to write the rules somewhere
-#some of the prospect boards are being added wrapped in an array -- needs to be fixed.

@@ -19,6 +19,7 @@ class checkersFrank:
         self.sideCOE=0
         self.gameNum=None
         self.bioFile=None
+
     def addToSeq(self,newState,newScore):
         newState=np.array(newState)
         newScore=np.array(newScore)
@@ -33,14 +34,17 @@ class checkersFrank:
         except NameError:
             self.stateScores=np.array(np.zeros((1,1)))
             self.stateScores=np.append(self.stateScores,newScore,axis=1)
+
     def initWeights(self,bioPath):
         bio=np.load(bioPath)
         self.wOne=bio['arr_0']
         self.wTwo=bio['arr_1']
         self.gameNum=bio['arr_2']
         self.bioFile=bioPath
+
     def saveWeights(self,sOne,sTwo):
         np.savez(self.bioFile,sOne,sTwo,self.gameNum)
+
     def setSide(self,side):
         if(side==0):
             self.sideCOE=-1
@@ -96,18 +100,13 @@ class checkersFrank:
     def gradDesc(self,winner):
         bOne=np.copy(self.wOne)
         bTwo=np.copy(self.wTwo)
-        #print(stateSequence)
-        #print(score)
         print('Training Player: '+str(self.sideCOE))
         print('State shape: '+str(self.stateSequence.shape[1]))
-        #lose condition for both sides if turn limit is reached. Still not sold on this one.
-        #if(stateSequence.shape[1]>119):
-        #    winner=self.sideCOE*-1
-        #winner=winner*self.sideCOE
         if(winner==self.sideCOE):
-            winner=1
+            winner=1.0
         else:
-            winner=-1
+            winner=-1.0
+        print(winner)
         for i in range(1,self.stateSequence.shape[1]):
             predict=self.stateScores[0,i]
             inputZero=np.copy(self.stateSequence[:,i])
@@ -119,6 +118,8 @@ class checkersFrank:
             iterator=0
             while(True):
                 iterator+=1
+                #bOnePrior=np.copy(bOne)
+                #bTwoPrior=np.copy(bTwo)
                 #second layer
                 gradient_upper=self.smallTwo(inputZero,predict,winner,prodOne,bOne,bTwo)
                 #gradient_upper - 16x1
@@ -129,7 +130,7 @@ class checkersFrank:
                 #gradient_lower - 32x16
                 bOne=np.subtract(bOne,learning_step*gradient_lower)
                 bTwo=np.subtract(bTwo,learning_step*gradient_upper)
-                if(iterator>1000):
+                if(iterator>800):
                     break
             iterator=0
         return bOne, bTwo
@@ -154,5 +155,5 @@ class checkersFrank:
 
     def smallTwo(self,currentState,score,winner,prodOne,sOne,sTwo):
         #print('cost: '+str(self.mainEvaluator(currentState,sOne,sTwo)))
-        result=np.multiply(((self.mainEvaluator(currentState,sOne,sTwo)-winner)*((mt.e**self.mainEvaluator(currentState,sOne,sTwo))/((1+mt.e**self.mainEvaluator(currentState,sOne,sTwo))**2))),(1/(1+mt.e**(self.mainEvaluator(currentState,sOne,sTwo)*-1))))
+        result=np.multiply(((winner-self.mainEvaluator(currentState,sOne,sTwo))*((mt.e**self.mainEvaluator(currentState,sOne,sTwo))/((1+mt.e**self.mainEvaluator(currentState,sOne,sTwo))**2))),(1/(1+mt.e**(self.mainEvaluator(currentState,sOne,sTwo)*-1))))
         return result
