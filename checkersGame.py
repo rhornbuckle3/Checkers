@@ -55,7 +55,7 @@ def playBall():
         #print(currentState)
         check=False
         newState,newScore=activePlayer.state_decider(currentState)
-        check=endGameCheck(newState)
+        check=end_game_check(newState)
         if(np.array_equal(currentState,newState)):
             if(activePlayer==frankOne):
                 activePlayer=frankTwo
@@ -67,7 +67,7 @@ def playBall():
             if(count<0):
                 print("Black Wins")
             print_state(newState)
-            endGame()
+            end_game()
             break
         if(check):
             count=np.sum(newState)
@@ -76,7 +76,7 @@ def playBall():
             if(count<0):
                 print("Black Wins")
             print_state(newState)
-            endGame()
+            end_game()
             break
         if(activePlayer==frankOne):
             activePlayer=frankTwo
@@ -89,7 +89,7 @@ def playBall():
             if(count<0):
                 print("Black Wins")
             print_state(newState)
-            endGame()
+            end_game()
             break
         #print_state(newState)
         currentState=newState
@@ -100,7 +100,7 @@ def playBall():
 #black=0
 
 #game ending
-def endGameCheck(currentState):
+def end_game_check(currentState):
     global frankOne
     global frankTwo
     global activePlayer
@@ -112,7 +112,7 @@ def endGameCheck(currentState):
         return True
     return False
 
-def endGame():
+def end_game():
     global currentState
     global frankOne
     global frankTwo

@@ -59,20 +59,20 @@ class checkersFrank:
 
     def state_evaluator(self,potState,sOne,sTwo):
         potState=np.array(potState)
-        prodOne=np.array(np.zeros((1,16)))
-        for i in range(0,prodOne.shape[1]):
-            prodOne[0,i] = self.activationOne(i,potState,sOne)
-        result = self.activationTwo(prodOne,sTwo)
+        activation_set=np.array(np.zeros((1,16)))
+        for i in range(0,activation_set.shape[1]):
+            activation_set[0,i] = self.activation_one(i,potState,sOne)
+        result = self.activation_two(activation_set,sTwo)
         if(result>0):
             return 0
         else:
             return result
     
-    def activationOne(self,neuronNum,inputZero,sOne):
-        inputZero=inputZero.reshape((-1,1))
-        return 1/(1+mt.e**(np.matmul(sOne[:,neuronNum],inputZero)*-1))
+    def activation_one(self,neuron_id,learning_state,sOne):
+        learning_state=learning_state.reshape((-1,1))
+        return 1/(1+mt.e**(np.matmul(sOne[:,neuron_id],learning_state)*-1))
 
-    def activationTwo(self,inputOne,sTwo):
+    def activation_two(self,inputOne,sTwo):
         inputOne=inputOne.reshape((-1,1)) 
         return 1/(1+mt.e**(np.matmul(sTwo[:,0],inputOne)*-1))
 
@@ -106,11 +106,11 @@ class checkersFrank:
         print(winner)
         for i in range(1,self.stateSequence.shape[1]):
             predict=self.stateScores[0,i]
-            inputZero=np.copy(self.stateSequence[:,i])
-            inputZero=inputZero*self.sideCOE
-            prodOne=np.array(np.zeros((1,16)))
-            for j in range(0,prodOne.shape[1]):
-                prodOne[0,j]=self.activationOne(j,inputZero,bOne)
+            learning_state=np.copy(self.stateSequence[:,i])
+            learning_state=learning_state*self.sideCOE
+            activation_set=np.array(np.zeros((1,16)))
+            for j in range(0,activation_set.shape[1]):
+                activation_set[0,j]=self.activation_one(j,learning_state,bOne)
             learning_step=1e-2
             iterator=0
             while(True):
@@ -118,12 +118,12 @@ class checkersFrank:
                 #bOnePrior=np.copy(bOne)
                 #bTwoPrior=np.copy(bTwo)
                 #second layer
-                gradient_upper=self.smallTwo(inputZero,predict,winner,prodOne,bOne,bTwo)
+                gradient_upper=self.upper_gradient(learning_state,predict,winner,activation_set,bOne,bTwo)
                 #gradient_upper - 16x1
-                gradient_upper=gradient_upper*np.transpose(prodOne)
+                gradient_upper=gradient_upper*np.transpose(activation_set)
                 checkOne=np.copy(bOne)
                 #first layer
-                gradient_lower=self.smallOne(inputZero,predict,winner,prodOne,bOne,bTwo)
+                gradient_lower=self.lower_gradient(learning_state,predict,winner,activation_set,bOne,bTwo)
                 #gradient_lower - 32x16
                 bOne=np.subtract(bOne,learning_step*gradient_lower)
                 bTwo=np.subtract(bTwo,learning_step*gradient_upper)
@@ -131,24 +131,22 @@ class checkersFrank:
                     break
             iterator=0
         return bOne, bTwo
-    def activationOneD(self, neuronNum,inputZero,sOne,sTwo):
-        inputZero=inputZero.reshape((-1,1))
-        shapeTest=sOne[:,neuronNum].reshape((-1,1))
-        shapeTest=np.transpose(shapeTest)
-        sigmoid=self.activationOne(neuronNum,inputZero,sOne)
+    def activation_oneD(self, neuron_id,learning_state,sOne,sTwo):
+        learning_state=learning_state.reshape((-1,1))
+        sigmoid=self.activation_one(neuron_id,learning_state,sOne)
         return sigmoid*(1-sigmoid)
 
-    def smallOne(self,currentState,score,winner,prodOne,sOne,sTwo):
-        result=np.full((1,16),np.transpose(sTwo)*self.smallTwo(currentState,score,winner,prodOne,sOne,sTwo))
-        prodOneD=np.array(np.zeros((1,16)))
-        for i in range(0,prodOneD.shape[1]):
-            prodOneD[0,i]=self.activationOneD(i,currentState,sOne,sTwo)
-        result=np.multiply(result,prodOneD)
+    def lower_gradient(self,currentState,score,winner,activation_set,sOne,sTwo):
+        result=np.full((1,16),np.transpose(sTwo)*self.upper_gradient(currentState,score,winner,activation_set,sOne,sTwo))
+        activation_setD=np.array(np.zeros((1,16)))
+        for i in range(0,activation_setD.shape[1]):
+            activation_setD[0,i]=self.activation_oneD(i,currentState,sOne,sTwo)
+        result=np.multiply(result,activation_setD)
         currentState=currentState.reshape((-1,1))
         result=np.dot(currentState,result)
         return result
 
-    def smallTwo(self,currentState,score,winner,prodOne,sOne,sTwo):
+    def upper_gradient(self,currentState,score,winner,activation_set,sOne,sTwo):
         cost = (winner-self.state_evaluator(currentState,sOne,sTwo))**2
         e_to_x = mt.e**self.state_evaluator(currentState,sOne,sTwo)
         first_half = cost*(e_to_x/((1+e_to_x)**2))
