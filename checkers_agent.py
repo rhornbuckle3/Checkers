@@ -4,15 +4,16 @@
 #currently in the process of moving and rewriting the state farming methods into checkersGame
 import numpy as np
 import math as mt 
-import checkersGame as cG
+import checkers_game as cG
+import random
 #checkers-Act
-class checkersFrank:
+class checkers_agent:
     def __init__(self):
-        self.currentState=cG.defaultState
+        self.current_state=cG.default_state
         self.wOne=np.array(np.zeros((32,16)))
         self.wTwo=np.array(np.zeros((16,1)))
         self.kingDex=np.array(np.zeros((12)))
-        self.stateSequence=np.copy(cG.defaultState)
+        self.stateSequence=np.copy(cG.default_state)
         self.stateSequence=self.stateSequence.reshape((-1,1))
         self.stateScores=np.array(np.zeros((1,1)))
         self.side=None
@@ -27,7 +28,7 @@ class checkersFrank:
         newState=newState.reshape((-1,1))
         try: self.stateSequence=np.append(self.stateSequence,newState,axis=1)
         except NameError:
-            self.stateSequence=np.copy(defaultState)
+            self.stateSequence=np.copy(default_state)
             self.stateSequence=self.stateSequence.reshape((-1,1))
             self.stateSequence=np.append(self.stateSequence,newState,axis=1)
         try: self.stateScores=np.append(self.stateScores,newScore,axis=1)
@@ -52,10 +53,11 @@ class checkersFrank:
             self.sideCOE=1
 
     def evaluator_master(self,provided_set):
-        stateValue=np.array(np.zeros(len(provided_set)))
-        for i in range(0,stateValue.shape[0]):
-            stateValue[i]=self.state_evaluator(provided_set[i],self.wOne,self.wTwo)
-        return stateValue
+        #calls state_evaluator
+        state_evaluation=np.array(np.zeros(len(provided_set)))
+        for i in range(0,state_evaluation.shape[0]):
+            state_evaluation[i]=self.state_evaluator(provided_set[i],self.wOne,self.wTwo)
+        return state_evaluation
 
     def state_evaluator(self,potState,sOne,sTwo):
         potState=np.array(potState)
@@ -77,22 +79,30 @@ class checkersFrank:
         return 1/(1+mt.e**(np.matmul(sTwo[:,0],inputOne)*-1))
 
 
-    def state_decider(self,currentState):
-        currentState=currentState*self.sideCOE
-        provided_set=cG.state_farmer(currentState,self.sideCOE)
-        stateValue=self.evaluator_master(provided_set)
-        print(stateValue)
-        if(str(stateValue)=='[]'):
-            print(cG.print_state(currentState))
+    def state_decider(self,current_state):
+        current_state=current_state*self.sideCOE
+        provided_set=cG.state_farmer(current_state,self.sideCOE)
+        state_evaluation=self.evaluator_master(provided_set)
+        print(state_evaluation)
+        if(str(state_evaluation)=='[]'):
+            print(cG.print_state(current_state))
             print('Player '+str(self.sideCOE)+' Loses')
-            currentState
-            return currentState, self.state_evaluator(currentState,self.wOne,self.wTwo)
-        else:
-            best=np.argmax(stateValue)
+            current_state
+            return current_state
+        else:            
+            if(np.any(state_evaluation)):
+                best=np.argmax(state_evaluation)
+            else:
+                #return random if all states evaluate to 0.
+                range_rand=state_evaluation.shape[0]-1
+                if(range_rand==0):
+                    best=0
+                else:
+                    best=random.randrange(range_rand)
         newState=np.array(provided_set[best])
-        self.addToSeq(newState,stateValue[best])
+        self.addToSeq(newState,state_evaluation[best])
         newState=newState*self.sideCOE
-        return newState,stateValue[best]
+        return newState
 
     def grad_desc(self,winner):
         bOne=np.copy(self.wOne)
@@ -136,20 +146,20 @@ class checkersFrank:
         sigmoid=self.activation_one(neuron_id,learning_state,sOne)
         return sigmoid*(1-sigmoid)
 
-    def lower_gradient(self,currentState,score,winner,activation_set,sOne,sTwo):
-        result=np.full((1,16),np.transpose(sTwo)*self.upper_gradient(currentState,score,winner,activation_set,sOne,sTwo))
+    def lower_gradient(self,current_state,score,winner,activation_set,sOne,sTwo):
+        result=np.full((1,16),np.transpose(sTwo)*self.upper_gradient(current_state,score,winner,activation_set,sOne,sTwo))
         activation_setD=np.array(np.zeros((1,16)))
         for i in range(0,activation_setD.shape[1]):
-            activation_setD[0,i]=self.activation_oneD(i,currentState,sOne,sTwo)
+            activation_setD[0,i]=self.activation_oneD(i,current_state,sOne,sTwo)
         result=np.multiply(result,activation_setD)
-        currentState=currentState.reshape((-1,1))
-        result=np.dot(currentState,result)
+        current_state=current_state.reshape((-1,1))
+        result=np.dot(current_state,result)
         return result
 
-    def upper_gradient(self,currentState,score,winner,activation_set,sOne,sTwo):
-        cost = (winner-self.state_evaluator(currentState,sOne,sTwo))**2
-        e_to_x = mt.e**self.state_evaluator(currentState,sOne,sTwo)
+    def upper_gradient(self,current_state,score,winner,activation_set,sOne,sTwo):
+        cost = (winner-self.state_evaluator(current_state,sOne,sTwo))**2
+        e_to_x = mt.e**self.state_evaluator(current_state,sOne,sTwo)
         first_half = cost*(e_to_x/((1+e_to_x)**2))
-        second_half = (1/(1+mt.e**(self.state_evaluator(currentState,sOne,sTwo)*-1)))
+        second_half = (1/(1+mt.e**(self.state_evaluator(current_state,sOne,sTwo)*-1)))
         result = np.multiply(first_half,second_half)
         return result

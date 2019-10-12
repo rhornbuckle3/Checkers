@@ -1,7 +1,7 @@
 #Russell Hornbuckle
 #2018-2019
 #checkers
-#Currently in the process of overhauling and rewriting this project - as a result, it is a bit of a mess.
+#Currently in the process of overhauling and rewriting this project - as a result, it has a couple naming schemas and varying quality throughout.
 
 #RULES
 #Original (one piece takes a single other piece) jumps are compulsory, secondary (takes two pieces) and more jumps are not.
@@ -9,10 +9,11 @@
 #Game will end in the favor of whoever has a higher score at 121 turns
 #Score is determined by the pieces remaining for each player: kings are 2, regular pieces are 1
 
-
+#BUGLIST
+#Gradient descent currently pushes all states to 0.
 import numpy as np   
-import checkersGame as cg 
-from checkersFrank import checkersFrank as cf
+import checkers_game as cg 
+from checkers_agent import checkers_agent as ca
 
 
 #remove triple quotes below to reset weights (or add them to not reset weights)
@@ -20,13 +21,13 @@ from checkersFrank import checkersFrank as cf
 wOne=np.array(np.random.standard_normal((32,16)))
 wTwo=np.array(np.random.standard_normal((16,1)))
 game=np.array(np.zeros((1,1)))
-np.savez("./Frank/bio-Two.npz",wOne,wTwo,game)
+np.savez("./Agent/bio-Two.npz",wOne,wTwo,game)
 wOne=np.array(np.random.standard_normal((32,16)))
 wTwo=np.array(np.random.standard_normal((16,1)))
 game=np.array(np.zeros((1,1)))
-np.savez("./Frank/bio-One.npz",wOne,wTwo,game)
+np.savez("./Agent/bio-One.npz",wOne,wTwo,game)
 cg.initPlayer()
-cg.playBall()
+cg.play_game()
 '''
 
 
@@ -37,11 +38,11 @@ while(True):
     game+=1
     print('Game: '+ str(game))
     cg.initPlayer()
-    cg.playBall()
+    cg.play_game()
 
 '''
 cg.initPlayer()
-cg.playBall()
+cg.play_game()
 
 
 

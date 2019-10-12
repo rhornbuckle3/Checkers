@@ -4,95 +4,90 @@
 #In the process of moving and rewriting the state farmer over here from checkersFrank
 import numpy as np
 import math as mt
-from checkersFrank import checkersFrank as cf
-defaultState=np.array((1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1))
+from checkers_agent import checkers_agent as ca
+default_state=np.array((1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1))
 #assign sides via binomial random pulls
-frankOne=None
-frankTwo=None
-activePlayer=None
+agent_one=None
+agent_two=None
+active_player=None
 #stateSequence=np.append(stateSequence,np.array([0]),axis=0)
 
 #sequence methods
 #initialization
 def initPlayer():
-    global activePlayer
-    global frankOne
-    global currentState
-    currentState=np.copy(defaultState)
-    #global currentState
-    #global defaultState
+    global active_player
+    global agent_one
+    global current_state
+    current_state=np.copy(default_state)
+    #global current_state
+    #global default_state
     coinFlip=np.random.binomial(1,.5)
-    frankOne=cf()
-    frankOne.setSide(coinFlip)
-    print('FrankOne is side: '+str(coinFlip)+'; 0 is black, 1 is white')
-    frankOne.initWeights("./Frank/bio-One.npz")
+    agent_one=ca()
+    agent_one.setSide(coinFlip)
+    print('agent_one is side: '+str(coinFlip)+'; 0 is black, 1 is white')
+    agent_one.initWeights("./Agent/bio-One.npz")
     if(coinFlip==1):
         coinFlip=0
     else:
         coinFlip=1
-    global frankTwo
-    frankTwo=cf()
-    frankTwo.setSide(coinFlip)
-    frankTwo.initWeights("./Frank/bio-Two.npz")
+    global agent_two
+    agent_two=ca()
+    agent_two.setSide(coinFlip)
+    agent_two.initWeights("./Agent/bio-Two.npz")
     if(coinFlip==1):
-        activePlayer=frankTwo
+        active_player=agent_two
     else:
-        activePlayer=frankOne
-    #currentState=defaultState
+        active_player=agent_one
+    #current_state=default_state
 
 
 #Game manager
-def playBall():
-    global frankOne
-    global frankTwo
-    global activePlayer
-    global currentState
+def play_game():
+    global agent_one
+    global agent_two
+    global active_player
+    global current_state
     turn=1
-    #print(frankOne.wOne)
-    #print(frankOne.wTwo)
     while(True):
-        #print(turn)
-        #print(currentState)
         check=False
-        newState,newScore=activePlayer.state_decider(currentState)
-        check=end_game_check(newState)
-        if(np.array_equal(currentState,newState)):
-            if(activePlayer==frankOne):
-                activePlayer=frankTwo
+        new_state = active_player.state_decider(current_state)
+        check = end_game_check(new_state)
+        if(np.array_equal(current_state,new_state)):
+            if(active_player==agent_one):
+                active_player=agent_two
             else:
-                activePlayer=frankOne
-            count=np.sum(newState)
+                active_player=agent_one
+            count=np.sum(new_state)
             if(count>0):
                 print("White Wins")
             if(count<0):
                 print("Black Wins")
-            print_state(newState)
+            print_state(new_state)
             end_game()
             break
         if(check):
-            count=np.sum(newState)
+            count=np.sum(new_state)
             if(count>0):
                 print("White Wins")
             if(count<0):
                 print("Black Wins")
-            print_state(newState)
+            print_state(new_state)
             end_game()
             break
-        if(activePlayer==frankOne):
-            activePlayer=frankTwo
+        if(active_player==agent_one):
+            active_player=agent_two
         else:
-            activePlayer=frankOne
+            active_player=agent_one
         if(turn>120):
-            count=np.sum(newState)
+            count=np.sum(new_state)
             if(count>0):
                 print("White Wins")
             if(count<0):
                 print("Black Wins")
-            print_state(newState)
+            print_state(new_state)
             end_game()
             break
-        #print_state(newState)
-        currentState=newState
+        current_state=new_state
         turn=turn+1
 
 #winner values:
@@ -100,49 +95,50 @@ def playBall():
 #black=0
 
 #game ending
-def end_game_check(currentState):
-    global frankOne
-    global frankTwo
-    global activePlayer
-    sumBum=0
-    currentState=currentState.reshape((-1,1))
+def end_game_check(current_state):
+    global agent_one
+    global agent_two
+    global active_player
+    board_sum=0
+    current_state=current_state.reshape((-1,1))
     for i in range(0,32):
-        sumBum=sumBum+mt.fabs(currentState[i,0])
-    if(mt.fabs(np.sum(currentState))==sumBum):
+        board_sum=board_sum+mt.fabs(current_state[i,0])
+    if(mt.fabs(np.sum(current_state))==board_sum):
         return True
-    return False
+    else:
+        return False
 
 def end_game():
-    global currentState
-    global frankOne
-    global frankTwo
-    global activePlayer
-    #print(activePlayer.sideCOE)
-    #print(currentState)
+    global current_state
+    global agent_one
+    global agent_two
+    global active_player
+    #print(active_player.sideCOE)
+    #print(current_state)
     #print(stateScores)
-    if(np.sum(currentState)>0):
+    if(np.sum(current_state)>0):
         winner=1
-    if(np.sum(currentState)<0):
+    if(np.sum(current_state)<0):
         winner=-1
-    if(np.sum(currentState)==0):
-        if(activePlayer.sideCOE==1):
+    if(np.sum(current_state)==0):
+        if(active_player.sideCOE==1):
             winner=-1
         else:
             winner=1
     #for i in range(0,16):
-    #    print(frankOne.wOne[:,i])
+    #    print(agent_one.wOne[:,i])
     #print("new")
-    aOne,aTwo=frankOne.grad_desc(winner)
-    frankOne.saveWeights(aOne,aTwo)
+    aOne,aTwo=agent_one.grad_desc(winner)
+    agent_one.saveWeights(aOne,aTwo)
     #print(aOne)
     #print(aTwo)
-    bOne,bTwo=frankTwo.grad_desc(winner)
-    frankTwo.saveWeights(bOne,bTwo)
-    del frankOne
-    del frankTwo
-    del activePlayer
+    bOne,bTwo=agent_two.grad_desc(winner)
+    agent_two.saveWeights(bOne,bTwo)
+    del agent_one
+    del agent_two
+    del active_player
     #print(stateSequence)
-    #frankTwo.saveWeights(bOne,bTwo)
+    #agent_two.saveWeights(bOne,bTwo)
 
 
 def print_state(board_state):
