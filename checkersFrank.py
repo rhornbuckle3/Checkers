@@ -61,8 +61,12 @@ class checkersFrank:
         potState=np.array(potState)
         prodOne=np.array(np.zeros((1,16)))
         for i in range(0,prodOne.shape[1]):
-            prodOne[0,i]=self.activationOne(i,potState,sOne)
-        return self.activationTwo(prodOne,sTwo)
+            prodOne[0,i] = self.activationOne(i,potState,sOne)
+        result = self.activationTwo(prodOne,sTwo)
+        if(result>0):
+            return 0
+        else:
+            return result
     
     def activationOne(self,neuronNum,inputZero,sOne):
         inputZero=inputZero.reshape((-1,1))
@@ -75,17 +79,10 @@ class checkersFrank:
 
     def stateDecider(self,currentState):
         currentState=currentState*self.sideCOE
-        #provided_set=self.stateProvider(currentState)
         provided_set=cG.state_farmer(currentState,self.sideCOE)
-        #for sub_set in provided_set:
-           #for board in sub_set:
-                #for sub in board:
-                    #print(sub)
         stateValue=self.stateEvaluatorMaster(provided_set)
-        #if(self.sideCOE==-1):
-            #stateValue=stateValue*self.sideCOE
+        print(stateValue)
         if(str(stateValue)=='[]'):
-            #print(provided_set)
             print(cG.print_state(currentState))
             print('Player '+str(self.sideCOE)+' Loses')
             currentState
@@ -136,14 +133,12 @@ class checkersFrank:
         return bOne, bTwo
     def activationOneD(self, neuronNum,inputZero,sOne,sTwo):
         inputZero=inputZero.reshape((-1,1))
-        #return (mt.e**np.matmul(sOne[:,neuronNum],inputZero))/((1+mt.e**np.matmul(sOne[:,neuronNum],inputZero))**2)
         shapeTest=sOne[:,neuronNum].reshape((-1,1))
         shapeTest=np.transpose(shapeTest)
         sigmoid=self.activationOne(neuronNum,inputZero,sOne)
         return sigmoid*(1-sigmoid)
 
     def smallOne(self,currentState,score,winner,prodOne,sOne,sTwo):
-        #result=np.array(np.zeros((1,16)))
         result=np.full((1,16),np.transpose(sTwo)*self.smallTwo(currentState,score,winner,prodOne,sOne,sTwo))
         prodOneD=np.array(np.zeros((1,16)))
         for i in range(0,prodOneD.shape[1]):
@@ -154,6 +149,9 @@ class checkersFrank:
         return result
 
     def smallTwo(self,currentState,score,winner,prodOne,sOne,sTwo):
-        #print('cost: '+str(self.mainEvaluator(currentState,sOne,sTwo)))
-        result=np.multiply(((winner-self.mainEvaluator(currentState,sOne,sTwo))*((mt.e**self.mainEvaluator(currentState,sOne,sTwo))/((1+mt.e**self.mainEvaluator(currentState,sOne,sTwo))**2))),(1/(1+mt.e**(self.mainEvaluator(currentState,sOne,sTwo)*-1))))
+        cost = (winner-self.mainEvaluator(currentState,sOne,sTwo))**2
+        e_to_x = mt.e**self.mainEvaluator(currentState,sOne,sTwo)
+        first_half = cost*(e_to_x/((1+e_to_x)**2))
+        second_half = (1/(1+mt.e**(self.mainEvaluator(currentState,sOne,sTwo)*-1)))
+        result = np.multiply(first_half,second_half)
         return result
