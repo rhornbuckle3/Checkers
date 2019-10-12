@@ -54,7 +54,7 @@ def playBall():
         #print(turn)
         #print(currentState)
         check=False
-        newState,newScore=activePlayer.stateDecider(currentState)
+        newState,newScore=activePlayer.state_decider(currentState)
         check=endGameCheck(newState)
         if(np.array_equal(currentState,newState)):
             if(activePlayer==frankOne):
@@ -132,11 +132,11 @@ def endGame():
     #for i in range(0,16):
     #    print(frankOne.wOne[:,i])
     #print("new")
-    aOne,aTwo=frankOne.gradDesc(winner)
+    aOne,aTwo=frankOne.grad_desc(winner)
     frankOne.saveWeights(aOne,aTwo)
     #print(aOne)
     #print(aTwo)
-    bOne,bTwo=frankTwo.gradDesc(winner)
+    bOne,bTwo=frankTwo.grad_desc(winner)
     frankTwo.saveWeights(bOne,bTwo)
     del frankOne
     del frankTwo

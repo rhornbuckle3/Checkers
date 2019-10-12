@@ -51,13 +51,13 @@ class checkersFrank:
         if(side==1):
             self.sideCOE=1
 
-    def stateEvaluatorMaster(self,provided_set):
+    def evaluator_master(self,provided_set):
         stateValue=np.array(np.zeros(len(provided_set)))
         for i in range(0,stateValue.shape[0]):
-            stateValue[i]=self.mainEvaluator(provided_set[i],self.wOne,self.wTwo)
+            stateValue[i]=self.state_evaluator(provided_set[i],self.wOne,self.wTwo)
         return stateValue
 
-    def mainEvaluator(self,potState,sOne,sTwo):
+    def state_evaluator(self,potState,sOne,sTwo):
         potState=np.array(potState)
         prodOne=np.array(np.zeros((1,16)))
         for i in range(0,prodOne.shape[1]):
@@ -77,16 +77,16 @@ class checkersFrank:
         return 1/(1+mt.e**(np.matmul(sTwo[:,0],inputOne)*-1))
 
 
-    def stateDecider(self,currentState):
+    def state_decider(self,currentState):
         currentState=currentState*self.sideCOE
         provided_set=cG.state_farmer(currentState,self.sideCOE)
-        stateValue=self.stateEvaluatorMaster(provided_set)
+        stateValue=self.evaluator_master(provided_set)
         print(stateValue)
         if(str(stateValue)=='[]'):
             print(cG.print_state(currentState))
             print('Player '+str(self.sideCOE)+' Loses')
             currentState
-            return currentState, self.mainEvaluator(currentState,self.wOne,self.wTwo)
+            return currentState, self.state_evaluator(currentState,self.wOne,self.wTwo)
         else:
             best=np.argmax(stateValue)
         newState=np.array(provided_set[best])
@@ -94,7 +94,7 @@ class checkersFrank:
         newState=newState*self.sideCOE
         return newState,stateValue[best]
 
-    def gradDesc(self,winner):
+    def grad_desc(self,winner):
         bOne=np.copy(self.wOne)
         bTwo=np.copy(self.wTwo)
         print('Training Player: '+str(self.sideCOE))
@@ -149,9 +149,9 @@ class checkersFrank:
         return result
 
     def smallTwo(self,currentState,score,winner,prodOne,sOne,sTwo):
-        cost = (winner-self.mainEvaluator(currentState,sOne,sTwo))**2
-        e_to_x = mt.e**self.mainEvaluator(currentState,sOne,sTwo)
+        cost = (winner-self.state_evaluator(currentState,sOne,sTwo))**2
+        e_to_x = mt.e**self.state_evaluator(currentState,sOne,sTwo)
         first_half = cost*(e_to_x/((1+e_to_x)**2))
-        second_half = (1/(1+mt.e**(self.mainEvaluator(currentState,sOne,sTwo)*-1)))
+        second_half = (1/(1+mt.e**(self.state_evaluator(currentState,sOne,sTwo)*-1)))
         result = np.multiply(first_half,second_half)
         return result
