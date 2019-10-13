@@ -112,7 +112,7 @@ class checkers_agent:
         if(winner == self.sideCOE):
             winner = 1.0
         else:
-            winner = -1.0
+            winner = 0
         print(winner)
         for i in range(1,self.stateSequence.shape[1]):
             predict = self.stateScores[0,i]
