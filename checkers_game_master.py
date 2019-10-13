@@ -18,32 +18,31 @@ from checkers_agent import checkers_agent as ca
 
 #remove triple quotes below to reset weights (or add them to not reset weights)
 '''
-wOne=np.array(np.random.standard_normal((32,16)))
-wTwo=np.array(np.random.standard_normal((16,1)))
-game=np.array(np.zeros((1,1)))
+wOne = np.array(np.random.standard_normal((32,16)))
+wTwo = np.array(np.random.standard_normal((16,1)))
+game = np.array(np.zeros((1,1)))
 np.savez("./Agent/bio-Two.npz",wOne,wTwo,game)
-wOne=np.array(np.random.standard_normal((32,16)))
-wTwo=np.array(np.random.standard_normal((16,1)))
-game=np.array(np.zeros((1,1)))
+wOne = np.array(np.random.standard_normal((32,16)))
+wTwo = np.array(np.random.standard_normal((16,1)))
+game = np.array(np.zeros((1,1)))
 np.savez("./Agent/bio-One.npz",wOne,wTwo,game)
 cg.initPlayer()
 cg.play_game()
 '''
 
 
-'''
 
-game=0
+
+game = 0
 while(True):
     game+=1
     print('Game: '+ str(game))
     cg.initPlayer()
     cg.play_game()
 
-'''
-cg.initPlayer()
-cg.play_game()
 
+#cg.initPlayer()
+#cg.play_game()
 
 
 
