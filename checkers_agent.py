@@ -26,11 +26,13 @@ class checkers_agent:
         newScore = np.array(newScore)
         newScore = newScore.reshape((1,1))
         newState = newState.reshape((-1,1))
+
         try: self.stateSequence = np.append(self.stateSequence,newState,axis = 1)
         except NameError:
-            self.stateSequence = np.copy(default_state)
+            self.stateSequence = np.copy(cG.default_state)
             self.stateSequence = self.stateSequence.reshape((-1,1))
             self.stateSequence = np.append(self.stateSequence,newState,axis = 1)
+
         try: self.stateScores = np.append(self.stateScores,newScore,axis = 1)
         except NameError:
             self.stateScores = np.array(np.zeros((1,1)))
@@ -125,19 +127,16 @@ class checkers_agent:
             iterator = 0
             while(True):
                 iterator += 1
-                #bOnePrior = np.copy(bOne)
-                #bTwoPrior = np.copy(bTwo)
                 #second layer
                 gradient_upper = self.upper_gradient(learning_state,predict,winner,activation_set,bOne,bTwo)
                 #gradient_upper - 16x1
                 gradient_upper = gradient_upper*np.transpose(activation_set)
-                checkOne = np.copy(bOne)
                 #first layer
                 gradient_lower = self.lower_gradient(learning_state,predict,winner,activation_set,bOne,bTwo)
                 #gradient_lower - 32x16
                 bOne = np.subtract(bOne,learning_step*gradient_lower)
                 bTwo = np.subtract(bTwo,learning_step*gradient_upper)
-                if(iterator>100):
+                if(iterator > 100 or winner - self.state_evaluator(learning_state,bOne,bTwo) == 0):
                     break
             iterator = 0
         return bOne, bTwo
