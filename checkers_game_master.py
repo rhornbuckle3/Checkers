@@ -10,7 +10,7 @@
 #Score is determined by the pieces remaining for each player: kings are 2, regular pieces are 1
 
 #BUGLIST
-#Gradient descent currently pushes all states to 0.
+#
 import numpy as np   
 import checkers_game as cg 
 from checkers_agent import checkers_agent as ca
@@ -21,17 +21,24 @@ from checkers_agent import checkers_agent as ca
 wOne = np.array(np.random.standard_normal((32,16)))
 wTwo = np.array(np.random.standard_normal((16,1)))
 game = np.array(np.zeros((1,1)))
-np.savez("./Agent/bio-Two.npz",wOne,wTwo,game)
+np.savez("./Agent/alpha-Two.npz",wOne,wTwo,game)
 wOne = np.array(np.random.standard_normal((32,16)))
 wTwo = np.array(np.random.standard_normal((16,1)))
 game = np.array(np.zeros((1,1)))
-np.savez("./Agent/bio-One.npz",wOne,wTwo,game)
-cg.initPlayer()
-cg.play_game()
+np.savez("./Agent/alpha-One.npz",wOne,wTwo,game)
 '''
 
-
-
+'''
+wOne = np.array(np.random.standard_normal((32,16)))
+wTwo = np.array(np.random.standard_normal((16,16)))
+wThree = wTwo = np.array(np.random.standard_normal((16,1)))
+np.savez("./Agent/beta-Two.npz",wOne,wTwo,wThree)
+wOne = np.array(np.random.standard_normal((32,16)))
+wTwo = np.array(np.random.standard_normal((16,16)))
+wThree = np.array(np.random.standard_normal((16,1)))
+np.savez("./Agent/beta-One.npz",wOne,wTwo,wThree)
+'''
+'''
 
 game = 0
 while(True):
@@ -39,15 +46,22 @@ while(True):
     print('Game: '+ str(game))
     cg.initPlayer()
     cg.play_game()
+'''
 
+cg.initPlayer()
+cg.play_game()
 
-#cg.initPlayer()
-#cg.play_game()
-
-
-
-
-
+'''
+import keras
+from keras.models import Sequential, model_from_json
+from keras.layers import Dense
+model = Sequential()
+model.add(Dense(16,input_dim=32,activation='relu'))
+model.add(Dense(16,activation='relu'))
+model.add(Dense(1,activation='relu'))
+model.compile(loss='mean_squared_error',optimizer='sgd',metrics=['accuracy'])
+model.save_weights('./Agent/gamma_two.hdf')
+'''
 #cg.print_state(cg.defaultState)
 #cg.board_contract(cg.board_expand(cg.defaultState,False))
 #move_set=cg.state_farmer(cg.defaultState,1)

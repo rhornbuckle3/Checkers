@@ -19,24 +19,23 @@ def initPlayer():
     current_state = np.copy(default_state)
     #global current_state
     #global default_state
-    coinFlip = np.random.binomial(1,.5)
+    coin_flip = np.random.binomial(1,.5)
     agent_one = ca()
-    agent_one.setSide(coinFlip)
-    print('agent_one is side: '+str(coinFlip)+'; 0 is black, 1 is white')
-    agent_one.initWeights("./Agent/bio-One.npz")
-    if(coinFlip == 1):
-        coinFlip = 0
+    agent_one.set_side(coin_flip)
+    print('agent_one is side: '+str(coin_flip)+'; 0 is black, 1 is white')
+    agent_one.init_weights("./Agent/gamma_one.hdf")
+    if(coin_flip == 1):
+        coin_flip = 0
     else:
-        coinFlip = 1
+        coin_flip = 1
     global agent_two
     agent_two = ca()
-    agent_two.setSide(coinFlip)
-    agent_two.initWeights("./Agent/bio-Two.npz")
-    if(coinFlip == 1):
+    agent_two.set_side(coin_flip)
+    agent_two.init_weights("./Agent/gamma_two.hdf")
+    if(coin_flip == 1):
         active_player = agent_two
     else:
         active_player = agent_one
-
 
 #Game manager
 def play_game():
@@ -110,32 +109,24 @@ def end_game():
     global agent_one
     global agent_two
     global active_player
-    #print(active_player.sideCOE)
-    #print(current_state)
-    #print(stateScores)
     if(np.sum(current_state)>0):
-        winner = 1
-    if(np.sum(current_state)<0):
-        winner = -1
-    if(np.sum(current_state) == 0):
-        if(active_player.sideCOE == 1):
-            winner = -1
+        winner = 1.0
+    else:
+        if(np.sum(current_state)<0):
+            winner = -1.0
         else:
-            winner = 1
-    #for i in range(0,16):
-    #    print(agent_one.wOne[:,i])
-    #print("new")
-    aOne,aTwo = agent_one.grad_desc(winner)
-    agent_one.saveWeights(aOne,aTwo)
-    #print(aOne)
-    #print(aTwo)
-    bOne,bTwo = agent_two.grad_desc(winner)
-    agent_two.saveWeights(bOne,bTwo)
+            if(active_player.side == 1):
+                winner = -1.0
+            else:
+                winner = 1.0
+    #train here
+    agent_one.network_train(winner)
+    agent_two.network_train(winner)
+    agent_one.save_weights('./Agent/gamma_one.hdf')
+    agent_two.save_weights('./Agent/gamma_two.hdf')
     del agent_one
     del agent_two
     del active_player
-    #print(stateSequence)
-    #agent_two.saveWeights(bOne,bTwo)
 
 
 def print_state(board_state):
