@@ -1,7 +1,7 @@
 #Russell Hornbuckle
-#2018-2019
+#2019
 #checkers
-#Currently in the process of overhauling and rewriting this project - as a result, it has a couple naming schemas and varying quality throughout.
+
 
 #RULES
 #Original (one piece takes a single other piece) jumps are compulsory, secondary (takes two pieces) and more jumps are not.
@@ -20,7 +20,7 @@ from keras.models import Sequential, model_from_json
 from keras.layers import Dense
 import re
 
-#Accepted Arguments: 'reset' to reset weights, 'infinity' to play until keyboard interrupt, or a number to play that number of games. If no argument is given, one game will be played.
+#Accepted Arguments: 'reset' to reset weights, 'infinity' to play until keyboard interrupt, or a number to play that number of games. If no valid argument is given, one game will be played.
 
 if(len(sys.argv)==2):
     if(str(sys.argv[1])=='reset'):
