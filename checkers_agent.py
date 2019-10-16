@@ -1,5 +1,5 @@
 #Russell Hornbuckle
-#2018-2019
+#2019
 #checkers
 
 import numpy as np
