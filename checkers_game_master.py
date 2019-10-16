@@ -13,63 +13,45 @@
 #
 import numpy as np   
 import checkers_game as cg 
+import sys
 from checkers_agent import checkers_agent as ca
-
-
-#remove triple quotes below to reset weights (or add them to not reset weights)
-'''
-wOne = np.array(np.random.standard_normal((32,16)))
-wTwo = np.array(np.random.standard_normal((16,1)))
-game = np.array(np.zeros((1,1)))
-np.savez("./Agent/alpha-Two.npz",wOne,wTwo,game)
-wOne = np.array(np.random.standard_normal((32,16)))
-wTwo = np.array(np.random.standard_normal((16,1)))
-game = np.array(np.zeros((1,1)))
-np.savez("./Agent/alpha-One.npz",wOne,wTwo,game)
-'''
-
-'''
-wOne = np.array(np.random.standard_normal((32,16)))
-wTwo = np.array(np.random.standard_normal((16,16)))
-wThree = wTwo = np.array(np.random.standard_normal((16,1)))
-np.savez("./Agent/beta-Two.npz",wOne,wTwo,wThree)
-wOne = np.array(np.random.standard_normal((32,16)))
-wTwo = np.array(np.random.standard_normal((16,16)))
-wThree = np.array(np.random.standard_normal((16,1)))
-np.savez("./Agent/beta-One.npz",wOne,wTwo,wThree)
-'''
-'''
-
-game = 0
-while(True):
-    game+=1
-    print('Game: '+ str(game))
-    cg.initPlayer()
-    cg.play_game()
-'''
-
-cg.initPlayer()
-cg.play_game()
-
-'''
 import keras
 from keras.models import Sequential, model_from_json
 from keras.layers import Dense
-model = Sequential()
-model.add(Dense(16,input_dim=32,activation='relu'))
-model.add(Dense(16,activation='relu'))
-model.add(Dense(1,activation='relu'))
-model.compile(loss='mean_squared_error',optimizer='sgd',metrics=['accuracy'])
-model.save_weights('./Agent/gamma_two.hdf')
-'''
-#cg.print_state(cg.defaultState)
-#cg.board_contract(cg.board_expand(cg.defaultState,False))
-#move_set=cg.state_farmer(cg.defaultState,1)
-#for i in range(0,len(move_set)):
-#    print(move_set[i])
-#    type_board=move_set[i]
-#    print(type(cg.board_expand(type_board[0],False)))
+import re
 
-#14.5
-#9.7
-#21.8
+#Accepted Arguments: 'reset' to reset weights, 'infinity' to play until keyboard interrupt, or a number to play that number of games. If no argument is given, one game will be played.
+
+if(len(sys.argv)==2):
+    if(str(sys.argv[1])=='reset'):
+        print("Resetting Weights")
+        for i in range(0,2):
+            print(str(i+1))
+            model = Sequential()
+            model.add(Dense(16,input_dim=32,activation='relu'))
+            model.add(Dense(16,activation='relu'))
+            model.add(Dense(1,activation='relu'))
+            model.compile(loss='mean_squared_error',optimizer='sgd',metrics=['accuracy'])
+            if(i == 0):
+                model.save_weights('./Agent/gamma_one.hdf')
+            else:
+                model.save_weights('./Agent/gamma_one.hdf')
+            del model
+    elif(str(sys.argv[1])=='infinity'):
+        game = 0
+        while(True):
+            game+=1
+            print('Game: '+ str(game))
+            cg.initPlayer()
+            cg.play_game()
+    elif(str(sys.argv[1]).isnumeric()):
+        game_total = int(str(sys.argv[1]))
+        game = 0
+        for i in range(0,game_total):
+            game+=1
+            print('Game: '+ str(game))
+            cg.initPlayer()
+            cg.play_game()
+    else:
+        cg.initPlayer()
+        cg.play_game()
