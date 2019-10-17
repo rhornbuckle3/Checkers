@@ -5,6 +5,7 @@
 import numpy as np
 import math as mt
 from checkers_agent import checkers_agent as ca
+
 default_state = np.array((1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1))
 #assign sides via binomial random pulls
 agent_one = None

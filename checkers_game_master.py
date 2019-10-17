@@ -14,11 +14,9 @@
 import numpy as np   
 import checkers_game as cg 
 import sys
-from checkers_agent import checkers_agent as ca
 import keras
 from keras.models import Sequential, model_from_json
 from keras.layers import Dense
-import re
 
 #Accepted Arguments: 'reset' to reset weights, 'infinity' to play until keyboard interrupt, or a number to play that number of games. If no valid argument is given, one game will be played.
 
