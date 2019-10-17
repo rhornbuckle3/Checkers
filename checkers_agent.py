@@ -88,7 +88,6 @@ class checkers_agent:
         if(str(state_evaluation) == '[]'):
             print(cG.print_state(current_state))
             print('Player '+str(self.side)+' Loses')
-            current_state
             return current_state
         else:            
             if(np.any(state_evaluation)):
