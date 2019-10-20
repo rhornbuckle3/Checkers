@@ -6,7 +6,7 @@
 #RULES
 #Original (one piece takes a single other piece) jumps are compulsory, secondary (takes two pieces) and more jumps are not.
 #Black goes first
-#Game will end in the favor of whoever has a higher score at 121 turns
+#Game will end when one side has no available moves or in the favor of whoever has a higher score at 121 turns
 #Score is determined by the pieces remaining for each player: kings are 2, regular pieces are 1
 
 #BUGLIST
