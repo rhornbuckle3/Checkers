@@ -40,7 +40,7 @@ if(len(sys.argv)==2):
         while(True):
             game+=1
             print('Game: '+ str(game))
-            cg.initPlayer()
+            cg.init_player()
             cg.play_game()
     elif(str(sys.argv[1]).isnumeric()):
         game_total = int(str(sys.argv[1]))
@@ -48,8 +48,12 @@ if(len(sys.argv)==2):
         for i in range(0,game_total):
             game+=1
             print('Game: '+ str(game))
-            cg.initPlayer()
+            cg.init_player()
             cg.play_game()
+    elif(str(sys.argv[1])=='play'):
+        #plays a random agent
+        cg.init_player()
+        cg.play_human()
     else:
-        cg.initPlayer()
+        cg.init_player()
         cg.play_game()

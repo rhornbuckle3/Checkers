@@ -13,7 +13,7 @@ active_player = None
 #considering swapping this over to a class to neuter my dependonce on globals here, I imagine that they could get awkward as the project grows.
 
 #initialization
-def initPlayer():
+def init_player():
     global active_player
     global agent_one
     global agent_two
@@ -38,6 +38,11 @@ def initPlayer():
         active_player = agent_one
 
 #Game manager
+def play_human():
+    global agent_one
+    global agent_two
+    global active_player
+    global current_state
 
 def play_game():
     global agent_one
@@ -167,6 +172,7 @@ def board_contract(board_state):
 #returns the list of legal moves (in the form of board states) given an input board state
 #board should be multiplied by color coeff before being shipped here. 
 #The color coeff is passed for determining if a piece should be king'ed and movement directtion for 1's
+#(potential place for improvement) - maintaining a list of where each peice is for each side will reduce the number of move checks from a(64) to a(12-b), where 'a' is the average legal moves and 'b' is the number of removed pieces
 def state_farmer(board_state, color_coeff):
     move_set = []
     jump_set = []
