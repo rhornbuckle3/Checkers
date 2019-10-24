@@ -18,7 +18,7 @@ class checkers_agent:
         self.wThree = np.array(np.zeros((16,1)))
         self.state_sequence = np.copy(cG.default_state)
         self.state_sequence = self.state_sequence.reshape((-1,1))
-        self.stateScores = np.array(np.zeros((1,1)))
+        self.state_scores = np.array(np.zeros((1,1)))
         self.side = 0
         self.bioFile = None
         #keras network is saved as a json string
@@ -39,10 +39,10 @@ class checkers_agent:
             self.state_sequence = self.state_sequence.reshape((-1,1))
             self.state_sequence = np.append(self.state_sequence,newState,axis = 1)
 
-        try: self.stateScores = np.append(self.stateScores,newScore,axis = 1)
+        try: self.state_scores = np.append(self.state_scores,newScore,axis = 1)
         except NameError:
-            self.stateScores = np.array(np.zeros((1,1)))
-            self.stateScores = np.append(self.stateScores,newScore,axis = 1)
+            self.state_scores = np.array(np.zeros((1,1)))
+            self.state_scores = np.append(self.state_scores,newScore,axis = 1)
 
     #loads weights into the model, given a viable system path
     def init_weights(self,path):

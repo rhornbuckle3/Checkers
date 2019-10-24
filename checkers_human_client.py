@@ -10,5 +10,7 @@ import Tkinter
 
 
 #
-client = Tkinter.tk()
-client.mainloop()
+def play_game(side_coe):
+    client = Tkinter.tk()
+    client.mainloop()
+    

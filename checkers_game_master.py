@@ -18,7 +18,8 @@ import keras
 from keras.models import Sequential, model_from_json
 from keras.layers import Dense
 
-#Accepted Arguments: 'reset' to reset weights, 'infinity' to play until keyboard interrupt, or a number to play that number of games. If no valid argument is given, one game will be played.
+
+#Accepted Arguments: 'reset' to reset weights, 'infinity' to play until keyboard interrupt, a number to play that number of games. Finally, 'play', which launches a GUI that allows for human vs agent games. If no valid argument is given, one game will be played.
 
 if(len(sys.argv)==2):
     if(str(sys.argv[1])=='reset'):

@@ -5,12 +5,15 @@
 import numpy as np
 import math as mt
 from checkers_agent import checkers_agent as ca
+import checkers_human_client as chc
 
 default_state = np.array((1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1))
 agent_one = None
 agent_two = None
 active_player = None
-#considering swapping this over to a class to neuter my dependonce on globals here, I imagine that they could get awkward as the project grows.
+
+#considering swapping this over to a class to eliminate my dependence on globals here, 
+#I imagine that they could get awkward as the project grows.
 
 #initialization
 def init_player():
@@ -43,6 +46,14 @@ def play_human():
     global agent_two
     global active_player
     global current_state
+    #run main here
+    play_agent = null
+    coin_flip = np.random.binomial(1,.5)
+    if(coin_flip == 1):
+        play_agent = agent_one
+    else:
+        play_agent = agent_two
+
 
 def play_game():
     global agent_one
@@ -172,7 +183,8 @@ def board_contract(board_state):
 #returns the list of legal moves (in the form of board states) given an input board state
 #board should be multiplied by color coeff before being shipped here. 
 #The color coeff is passed for determining if a piece should be king'ed and movement directtion for 1's
-#(potential place for improvement) - maintaining a list of where each peice is for each side will reduce the number of move checks from a(64) to a(12-b), where 'a' is the average legal moves and 'b' is the number of removed pieces
+#(potential place for improvement) - maintaining a list of where each peice is for each side will reduce the number of move checks 
+#from a(64) to a(12-b), where 'a' is the average legal moves and 'b' is the number of removed pieces
 def state_farmer(board_state, color_coeff):
     move_set = []
     jump_set = []
