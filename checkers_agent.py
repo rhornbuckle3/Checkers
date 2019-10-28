@@ -4,7 +4,7 @@
 
 import numpy as np
 import math as mt 
-import checkers_game as cG
+import checkers_game as cg
 import random
 import keras
 from keras.models import Sequential, model_from_json
@@ -12,11 +12,10 @@ from keras.layers import Dense
 #checkers-Act
 class checkers_agent:
     def __init__(self):
-        self.current_state = cG.default_state
         self.wOne = np.array(np.zeros((32,16)))
         self.wTwo = np.array(np.zeros((16,16)))
         self.wThree = np.array(np.zeros((16,1)))
-        self.state_sequence = np.copy(cG.default_state)
+        self.state_sequence = np.copy(cg.default_state)
         self.state_sequence = self.state_sequence.reshape((-1,1))
         self.state_scores = np.array(np.zeros((1,1)))
         self.side = 0
@@ -35,7 +34,7 @@ class checkers_agent:
         newState = newState.reshape((-1,1))
         try: self.state_sequence = np.append(self.state_sequence,newState,axis = 1)
         except NameError:
-            self.state_sequence = np.copy(cG.default_state)
+            self.state_sequence = np.copy(cg.default_state)
             self.state_sequence = self.state_sequence.reshape((-1,1))
             self.state_sequence = np.append(self.state_sequence,newState,axis = 1)
 
@@ -82,11 +81,11 @@ class checkers_agent:
     #determines the next move of the agent, given a state as input
     def state_decider(self,current_state):
         current_state = current_state*self.side
-        provided_set = cG.state_farmer(current_state,self.side)
+        provided_set = cg.state_farmer(current_state,self.side)
         state_evaluation = self.evaluator_master(provided_set)
         #print(state_evaluation)
         if(str(state_evaluation) == '[]'):
-            print(cG.print_state(current_state))
+            print(cg.print_state(current_state))
             print('Player '+str(self.side)+' Loses')
             return current_state
         else:            

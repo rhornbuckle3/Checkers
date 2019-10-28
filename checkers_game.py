@@ -5,7 +5,7 @@
 import numpy as np
 import math as mt
 from checkers_agent import checkers_agent as ca
-import checkers_human_client as chc
+from checkers_human_client import human_interface as hi
 
 default_state = np.array((1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1))
 agent_one = None
@@ -46,14 +46,29 @@ def play_human():
     global agent_two
     global active_player
     global current_state
-    #run main here
-    play_agent = null
+
+    #the players
+    human = hi()
+    play_agent
     coin_flip = np.random.binomial(1,.5)
     if(coin_flip == 1):
         play_agent = agent_one
+        del agent_two
     else:
         play_agent = agent_two
-
+        del agent_one
+    if(active_player == play_agent):
+        pass
+    else:
+        active_player = human
+    if(play_agent.side == 0):
+        human.set_side(1)
+    else:
+        human.set_side(0)
+    while(True):
+        new_state = active_player.state_decider(current_state)
+        check = end_game_check(new_state)
+        
 
 def play_game():
     global agent_one
